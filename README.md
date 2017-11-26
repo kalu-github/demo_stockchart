@@ -1,4 +1,4 @@
-![image](https://github.com/153437803/StockChart_v1.0/blob/master/Screenrecorder-2017-11-22-21-45-58-295_20171122220313.gif )  
+![image](https://github.com/153437803/StockChart/blob/master/Screenrecorder-2017-11-22-21-45-58-295_20171122220313.gif )  
 
 ```
     <declare-styleable name="StockChartView">
