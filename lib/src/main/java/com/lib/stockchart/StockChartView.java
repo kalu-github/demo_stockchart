@@ -152,24 +152,15 @@ public class StockChartView extends View {
                     // 高亮
                     final float x = e.getX();
                     final float y = e.getY();
-//                    EntryManager.getInstance().setPointHighlightX(false, x);
-//                    EntryManager.getInstance().setPointHighlightY(-2f, y);
 
-                    RenderManager.getInstance().getKlineRender().setxHighligh(x);
-                    RenderManager.getInstance().getTlineRender().setxHighligh(x);
-                    RenderManager.getInstance().getKlineRender().setyHighligh(y);
-                    RenderManager.getInstance().getTlineRender().setyHighligh(y);
-                    postInvalidate();
-
-                    if (EntryManager.getInstance().isHighlightMove()) {
-                        // Log.e("ooooooo1", "移动 ==> x = " + x + ", x1 = " + EntryManager.getInstance().getPointHighlightX()[0] + ", x2 = " + EntryManager.getInstance().getPointHighlightX()[1]);
+                    if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
+                        RenderManager.getInstance().getKlineRender().setxHighligh(x);
+                        RenderManager.getInstance().getKlineRender().setyHighligh(y);
                         postInvalidate();
-
-//                        if (null != listener) {
-//                            final int pointHighlight = EntryManager.getInstance().getPointHighlight();
-//                            final Entry entry = EntryManager.getInstance().getEntryList().get(pointHighlight);
-//                            listener.onHighlight(entry, pointHighlight, x, y);
-//                        }
+                    } else if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
+                        RenderManager.getInstance().getTlineRender().setxHighligh(x);
+                        RenderManager.getInstance().getTlineRender().setyHighligh(y);
+                        postInvalidate();
                     }
                 }
                 break;
@@ -186,11 +177,15 @@ public class StockChartView extends View {
 //                EntryManager.getInstance().setPointHighlightX(true, -1);
 //                EntryManager.getInstance().setPointHighlightY(-1f, -1f);
 //                invalidate();
-                RenderManager.getInstance().getKlineRender().setxHighligh(-1f);
-                RenderManager.getInstance().getTlineRender().setxHighligh(-1f);
-                RenderManager.getInstance().getKlineRender().setyHighligh(-1f);
-                RenderManager.getInstance().getTlineRender().setyHighligh(-1f);
-                postInvalidate();
+                if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
+                    RenderManager.getInstance().getKlineRender().setxHighligh(-1f);
+                    RenderManager.getInstance().getKlineRender().setyHighligh(-1f);
+                    postInvalidate();
+                } else if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
+                    RenderManager.getInstance().getTlineRender().setxHighligh(-1f);
+                    RenderManager.getInstance().getTlineRender().setyHighligh(-1f);
+                    postInvalidate();
+                }
 
                 // todo
                 if (canDragXoffset) {
@@ -213,17 +208,17 @@ public class StockChartView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-       // Log.e("StockChartView", "onDraw");
+        // Log.e("StockChartView", "onDraw");
 
         final int model = RenderManager.getInstance().getRenderModel();
 
         if (model == RenderManager.MODEL_TLINE_TURNOVER) {
 
-           // Log.e("StockChartView", "onDraw TLLINE");
+            // Log.e("StockChartView", "onDraw TLLINE");
             RenderManager.getInstance().getTlineRender().onCanvas(canvas, onLongPress, model);
         } else if (model == RenderManager.MODEL_KLINE_TURNOVER) {
 
-          //  Log.e("StockChartView", "onDraw KLLINE");
+            //  Log.e("StockChartView", "onDraw KLLINE");
             RenderManager.getInstance().getKlineRender().onCanvas(canvas, onLongPress, model);
         }
     }
@@ -236,7 +231,7 @@ public class StockChartView extends View {
         int top = getTop() + getPaddingTop();
         int right = getRight() - getPaddingRight();
         int bottom = getBottom() - getPaddingBottom();
-      //  Log.e("StockChartView", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom);
+        //  Log.e("StockChartView", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom);
         RenderManager.getInstance().getKlineRender().onSizeChanged(left, top, right, bottom);
         RenderManager.getInstance().getTlineRender().onSizeChanged(left, top, right, bottom);
 
@@ -363,17 +358,21 @@ public class StockChartView extends View {
                 onLongPress = true;
 
                 // 高亮
-                final float x = e.getRawX();
-                final float y = e.getRawY();
+                final float x = e.getX();
+                final float y = e.getY();
                 Log.e("kaluyyyy", "onLongPress ==> x = " + x + ", y = " + y);
 
                 //  Log.e("ooooooo1", "长按 ==> x1 = " + EntryManager.getInstance().getPointHighlightX()[0] + ", x2 = " + EntryManager.getInstance().getPointHighlightX()[1]);
-                RenderManager.getInstance().getKlineRender().setxHighligh(x);
-                RenderManager.getInstance().getTlineRender().setxHighligh(x);
-                RenderManager.getInstance().getKlineRender().setyHighligh(y);
-                RenderManager.getInstance().getTlineRender().setyHighligh(y);
 
-                postInvalidate();
+                if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
+                    RenderManager.getInstance().getKlineRender().setxHighligh(x);
+                    RenderManager.getInstance().getKlineRender().setyHighligh(y);
+                    postInvalidate();
+                } else if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
+                    RenderManager.getInstance().getTlineRender().setxHighligh(x);
+                    RenderManager.getInstance().getTlineRender().setyHighligh(y);
+                    postInvalidate();
+                }
 
 //                if (null != listener) {
 //                    final int pointHighlight = EntryManager.getInstance().getPointHighlight();
