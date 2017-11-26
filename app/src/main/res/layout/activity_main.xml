@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.lib.stockchart.StockChartView
+            android:id="@+id/kLineLayout"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:background="#44999999"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            app:scv_hint_load="努力加载数据中..."
+            app:scv_point_count="50"
+            app:scv_point_max="80"
+            app:scv_point_min="25"
+            app:scv_point_space="5dp"
+            app:scv_weight_down="1"
+            app:scv_weight_top="4"
+            app:scv_xlabel_height="10dp"
+            app:scv_xoffset_enable="true"
+            app:scv_xoffset_max="80dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp">
+
+            <Button
+                android:id="@+id/a"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:text="K线图" />
+
+            <Button
+                android:id="@+id/b"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:text="分时图" />
+
+            <Button
+                android:id="@+id/c"
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:text="切换" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

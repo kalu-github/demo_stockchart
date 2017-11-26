@@ -1,0 +1,28 @@
+<resources>
+
+    <declare-styleable name="StockChartView">
+        <!-- 权重 - 上面 -->
+        <attr name="scv_weight_top" format="integer" />
+        <!-- 权重 - 下面 -->
+        <attr name="scv_weight_down" format="integer" />
+        <!-- 加载提示信息 -->
+        <attr name="scv_hint_load" format="string|reference" />
+        <!-- 默认显示多少个点 -->
+        <attr name="scv_point_count" format="integer" />
+        <!-- 最多显示多少个点 -->
+        <attr name="scv_point_max" format="integer" />
+        <!-- 最少显示多少个点 -->
+        <attr name="scv_point_min" format="integer" />
+        <!-- 点与点间隙 -->
+        <attr name="scv_point_space" format="dimension|reference" />
+        <!-- 内边框边距 -->
+        <attr name="scv_board_padding" format="dimension|reference" />
+        <!-- X轴显示区域高度 -->
+        <attr name="scv_xlabel_height" format="dimension|reference" />
+        <!-- 刷新拖拽最大位移  -->
+        <attr name="scv_xoffset_max" format="dimension|reference" />
+        <!-- 是否可以刷新  -->
+        <attr name="scv_xoffset_enable" format="boolean" />
+    </declare-styleable>
+
+</resources>
