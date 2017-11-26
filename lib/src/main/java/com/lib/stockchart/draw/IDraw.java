@@ -2,7 +2,7 @@ package com.lib.stockchart.draw;
 
 import android.graphics.Canvas;
 
-import com.lib.stockchart.render.BaseRender;
+import com.lib.stockchart.render.AbstractRender;
 
 /**
  * description: 接口 - 画具体内容
@@ -22,6 +22,11 @@ public interface IDraw {
 
     /**
      * 绘制图形
+     *
+     * @param model 绘制模式
+     *              1:K线图+成交量 RenderManager.MODEL_KLLINE_TURNOVER
+     *              2:K线图+MACD+RSI+KDJ+BOLL RenderManager.MODEL_KLLINE_MACD_RSI_KDJ_BOLL
+     *              3:分时图+成交量 RenderManager.MODEL_TLLINE_TURNOVER
      */
-    void onDrawData(BaseRender render, Canvas canvas, int pointSum, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh);
+    void onDrawData(AbstractRender render, Canvas canvas, int pointCount, int pointVisableCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, boolean hightLight, int model);
 }

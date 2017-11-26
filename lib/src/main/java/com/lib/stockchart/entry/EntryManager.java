@@ -14,7 +14,9 @@ import java.util.List;
 public class EntryManager {
 
     // 图标边框和信息的内边距
-    private int boardPadding = 10;
+    private int padding = 10;
+    // X轴显示区域高度
+    private int xaxisHeight = 50;
     // 加载提示信息
     private String hintLoadStr = "正在加载数据中...";
     // 上部权重
@@ -24,62 +26,13 @@ public class EntryManager {
     // 默认显示多少个点
     private int pointCount = 50;
     // 最多显示多少个点
-    private int pointMax = 100;
+    private int pointMax = 40;
     // 最少显示多少个点
-    private int pointMin = 25;
+    private int pointMin = 100;
     // 当前显示区域, 起始点下标
     private int pointBegin = -1;
     // 当前显示区域, 结尾点下标
     private int pointEnd = -1;
-    // 每个点之间的空隙
-    private int pointSpace = 10;
-    // 每个点的宽度
-    private int pointWidth = 10;
-    // x轴显示文本区域高度
-    private int xlabelHeight = 50;
-    private int xoffsetLeft = 0;
-    private int xoffsetRight = 0;
-    private int xoffsetMax = 100;
-
-    public int getXoffsetMax() {
-        return xoffsetMax;
-    }
-
-    public void setXoffsetMax(int xoffsetMax) {
-        this.xoffsetMax = xoffsetMax;
-    }
-
-    public int getXoffsetLeft() {
-        return xoffsetLeft;
-    }
-
-    public void setXoffsetLeft(int xoffsetLeft) {
-        this.xoffsetLeft = xoffsetLeft;
-    }
-
-    public int getXoffsetRight() {
-        return xoffsetRight;
-    }
-
-    public void setXoffsetRight(int xoffsetRight) {
-        this.xoffsetRight = xoffsetRight;
-    }
-
-    public int getXlabelHeight() {
-        return xlabelHeight;
-    }
-
-    public void setXlabelHeight(int xlabelHeight) {
-        this.xlabelHeight = xlabelHeight;
-    }
-
-    public void setPointWidth(int pointWidth) {
-        this.pointWidth = pointWidth;
-    }
-
-    public int getPointWidth() {
-        return pointWidth;
-    }
 
     private volatile int pointHighlight = -1;
     // 高亮点, X坐标索引(第一个上一次, 第二个最新的)
@@ -87,20 +40,20 @@ public class EntryManager {
     // 高亮点, Y坐标索引(第一个上一次, 第二个最新的)
     private volatile float[] pointHighlightY = new float[]{-1, -1};
 
-    public int getPointSpace() {
-        return pointSpace;
+    public int getPadding() {
+        return padding;
     }
 
-    public void setPointSpace(int pointSpace) {
-        this.pointSpace = pointSpace;
+    public void setPadding(int padding) {
+        this.padding = padding;
     }
 
-    public int getBoardPadding() {
-        return boardPadding;
+    public int getXaxisHeight() {
+        return xaxisHeight;
     }
 
-    public void setBoardPadding(int boardPadding) {
-        this.boardPadding = boardPadding;
+    public void setXaxisHeight(int xaxisHeight) {
+        this.xaxisHeight = xaxisHeight;
     }
 
     public int getPointHighlight() {
@@ -211,12 +164,16 @@ public class EntryManager {
         private static EntryManager instance = new EntryManager();
     }
 
+    // Y 轴上 entry 的最大值
+    private float maxY = -1;
+    // Y 轴上 entry 的最小值
+    private float minY = -1;
+    // Y 轴上 entry 的最大值索引
+    private int maxYIndex = 0;
+    // Y 轴上 entry 的最小值索引
+    private int minYIndex = 0;
     // 数据集合
     private final ArrayList<Entry> entries = new ArrayList<>();
-
-    public ArrayList<Entry> getEntryList() {
-        return entries;
-    }
 
     public String getHintLoadStr() {
         return hintLoadStr;
@@ -229,11 +186,18 @@ public class EntryManager {
 
     // 重置数据
     public void resetData() {
+        maxY = -1;
+        minY = -1;
+        maxYIndex = 0;
+        minYIndex = 0;
         pointHighlightX[0] = -1;
         pointHighlightX[1] = -1;
         pointHighlightY[0] = -1;
         pointHighlightY[1] = -1;
         pointHighlight = -1;
+        pointCount = 50;
+        pointMax = 40;
+        pointMin = 100;
         pointBegin = -1;
         pointEnd = -1;
         entries.clear();
@@ -245,37 +209,69 @@ public class EntryManager {
         if (null == mDataList) return;
 
         final int size = mDataList.size();
-        pointEnd = size;
+        pointEnd = size - 1;
         pointBegin = size - pointCount;
 
         entries.clear();
         entries.addAll(mDataList);
 
-        // 计算 MA MACD BOLL RSI KDJ 指标
-        computeMA();
-        computeMACD();
-        computeBOLL();
-        computeRSI();
-        computeKDJ();
+        computeStockIndex();
+        calculateTurnoverMax();
+        calculatePriceMin();
+        calculatePriceMax();
+    }
+
+    // 最高价格
+    public float calculatePriceMax() {
+
+        float temp = 0;
+
+        for (int i = 0; i < entries.size(); i++) {
+            Entry entry = entries.get(i);
+            float high = entry.getHigh();
+            if (i == 0) {
+                temp = high;
+            } else {
+                temp = Math.max(temp, high);
+            }
+        }
+        return temp;
     }
 
     public float calculatePriceMax(int start, int end) {
 
         float temp = 0;
 
-        for (int i = start; i < end; i++) {
+        for (int i = start; i < end - 1; i++) {
             Entry entry = entries.get(i);
-            final float ma5 = entry.getMa5();
-            final float ma10 = entry.getMa10();
-            final float ma20 = entry.getMa20();
-            final float high = entry.getHigh();
-            final float max1 = Math.max(ma5, ma10);
-            final float max2 = Math.max(max1, ma20);
-            final float max3 = Math.max(max2, high);
+            float high = entry.getHigh();
             if (i == start) {
-                temp = max3;
+                temp = high;
             } else {
                 temp = Math.max(temp, high);
+            }
+        }
+        return temp;
+    }
+
+    public float calculatePrice(int index) {
+        return entries.get(index).getHigh();
+    }
+
+    // 最低价格
+    public float calculatePriceMin() {
+
+        float temp = 0;
+
+        for (int i = 0; i < entries.size(); i++) {
+            Entry entry = entries.get(i);
+
+            float low = entry.getLow();
+
+            if (i == 0) {
+                temp = low;
+            } else {
+                temp = Math.min(temp, low);
             }
         }
         return temp;
@@ -287,17 +283,29 @@ public class EntryManager {
 
         for (int i = start; i < end; i++) {
             Entry entry = entries.get(i);
-            final float ma5 = entry.getMa5();
-            final float ma10 = entry.getMa10();
-            final float ma20 = entry.getMa20();
-            final float low = entry.getLow();
-            final float min1 = Math.min(ma5, ma10);
-            final float min2 = Math.min(min1, ma20);
-            final float min3 = Math.min(min2, low);
+
+            float low = entry.getLow();
             if (i == start) {
-                temp = min3;
+                temp = low;
             } else {
                 temp = Math.min(temp, low);
+            }
+        }
+        return temp;
+    }
+
+    // 成交量最大值
+    public float calculateTurnoverMax() {
+
+        float temp = 0;
+
+        for (int i = 0; i < entries.size(); i++) {
+            Entry entry = entries.get(i);
+            float high = entry.getVolume();
+            if (i == 0) {
+                temp = high;
+            } else {
+                temp = Math.max(temp, high);
             }
         }
         return temp;
@@ -317,6 +325,97 @@ public class EntryManager {
             }
         }
         return temp;
+    }
+
+    /**
+     * 列表第一个 entry 的昨日收盘价，用于判断当第一个 entry 的收盘价等于开盘价时，
+     * 不好判断是涨停还是跌停还是不涨不跌，此值默认设置0，即一律视为涨停
+     */
+    private float preClose = 0;
+
+    /**
+     * 是否在加载中状态
+     */
+    private boolean loadingStatus = true;
+
+    /**
+     * 添加一个 entry 到尾部
+     */
+
+    public void addEntry(Entry entry) {
+        entries.add(entry);
+    }
+
+    /**
+     * 添加一组 entry 到尾部
+     */
+    public void addEntries(List<Entry> entries) {
+        this.entries.addAll(entries);
+    }
+
+    /**
+     * 添加一个 entry 到头部
+     */
+    public void insertFirst(Entry entry) {
+        entries.add(0, entry);
+    }
+
+    /**
+     * 添加一组 entry 到头部
+     */
+    public void insertFirst(List<Entry> entries) {
+        this.entries.addAll(0, entries);
+    }
+
+    public ArrayList<Entry> getEntryList() {
+        return entries;
+    }
+
+    public float getMinY() {
+        return minY;
+    }
+
+    public float getMaxY() {
+        return maxY;
+    }
+
+    public float getDeltaY() {
+        return maxY - minY;
+    }
+
+    public int getMinYIndex() {
+        return minYIndex;
+    }
+
+    public int getMaxYIndex() {
+        return maxYIndex;
+    }
+
+    public float getPreClose() {
+        return preClose;
+    }
+
+    public void setPreClose(float preClose) {
+        this.preClose = preClose;
+    }
+
+    public boolean isLoadingStatus() {
+        return loadingStatus;
+    }
+
+    public void setLoadingStatus(boolean loadingStatus) {
+        this.loadingStatus = loadingStatus;
+    }
+
+    /**
+     * 计算 MA MACD BOLL RSI KDJ 指标
+     */
+    public void computeStockIndex() {
+        computeMA();
+        computeMACD();
+        computeBOLL();
+        computeRSI();
+        computeKDJ();
     }
 
     /**

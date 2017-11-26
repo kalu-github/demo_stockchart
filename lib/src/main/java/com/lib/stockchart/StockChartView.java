@@ -35,6 +35,12 @@ import static android.content.Context.VIBRATOR_SERVICE;
  */
 public class StockChartView extends View {
 
+    private static final int KLINE_STATUS_IDLE = 0; // 空闲
+    private static final int KLINE_STATUS_RELEASE_BACK = 2; // 放手，回弹到 loading 位置
+    private static final int KLINE_STATUS_LOADING = 3; // 加载中
+    private static final int KLINE_STATUS_SPRING_BACK = 4; // 加载结束，回弹到初始位置
+    private int KLINE_STATUS = KLINE_STATUS_IDLE;
+
     private Context mContext = getContext().getApplicationContext();
     // 反弹速度
     private final ScrollerCompat scroller = ScrollerCompat.create(mContext, new Interpolator() {
@@ -45,15 +51,20 @@ public class StockChartView extends View {
     });
 
     // 与滚动控制、滑动加载数据相关的属性
+    private static final int OVERSCROLL_DURATION = 250; // dragging 松手之后回中的时间，单位：毫秒
+    private static final int OVERSCROLL_THRESHOLD = 250; // dragging 的偏移量大于此值时即是一个有效的滑动加载
+
+    private int lastFlingX = 0;
+    private int lastScrollDx = 0;
+    private int lastEntrySize = 0; // 上一次的 entry 列表大小，用于判断是否成功加载了数据
     // 与手势控制相关的属性
-    private boolean canDragXoffset = false;
     private boolean onTouch = false;
     private boolean onLongPress = false;
     private boolean onDoubleFingerPress = false;
     private boolean onVerticalMove = false;
-    private boolean onDragging = true;
-    private boolean enableLeftRefresh = true;
-    private boolean enableRightRefresh = true;
+    private boolean onDragging = false;
+    private boolean enableLeftRefresh = false;
+    private boolean enableRightRefresh = false;
 
     /**********************************************************************************************/
 
@@ -75,7 +86,6 @@ public class StockChartView extends View {
         final Resources.Theme theme = context.getTheme();
         final TypedArray a = theme.obtainStyledAttributes(attrs, R.styleable.StockChartView, defStyleAttr, defStyleAttr);
         try {
-
             int weightTop = a.getInt(R.styleable.StockChartView_scv_weight_top, 5);
             EntryManager.getInstance().setWeightTop(weightTop);
             int weightDown = a.getInt(R.styleable.StockChartView_scv_weight_down, 2);
@@ -86,19 +96,8 @@ public class StockChartView extends View {
             EntryManager.getInstance().setPointCount(pointCount);
             int pointMax = a.getInt(R.styleable.StockChartView_scv_point_max, 100);
             EntryManager.getInstance().setPointMax(pointMax);
-            int pointMin = a.getInt(R.styleable.StockChartView_scv_point_min, 25);
+            int pointMin = a.getInt(R.styleable.StockChartView_scv_point_min, 40);
             EntryManager.getInstance().setPointMin(pointMin);
-            int pointSpace = a.getDimensionPixelSize(R.styleable.StockChartView_scv_point_space, 10);
-            EntryManager.getInstance().setPointSpace(pointSpace);
-            final int boardPadding = a.getDimensionPixelSize(R.styleable.StockChartView_scv_board_padding, 5);
-            EntryManager.getInstance().setBoardPadding(boardPadding);
-            final int xlabelHeight = a.getDimensionPixelSize(R.styleable.StockChartView_scv_xlabel_height, 25);
-            EntryManager.getInstance().setXlabelHeight(xlabelHeight);
-            final int xoffsetMax = a.getDimensionPixelSize(R.styleable.StockChartView_scv_xoffset_max, 100);
-            EntryManager.getInstance().setXoffsetMax(xoffsetMax);
-
-            canDragXoffset = a.getBoolean(R.styleable.StockChartView_scv_xoffset_enable, false);
-
         } finally {
             a.recycle();
         }
@@ -152,24 +151,17 @@ public class StockChartView extends View {
                     // 高亮
                     final float x = e.getX();
                     final float y = e.getY();
-//                    EntryManager.getInstance().setPointHighlightX(false, x);
-//                    EntryManager.getInstance().setPointHighlightY(-2f, y);
-
-                    RenderManager.getInstance().getKlineRender().setxHighligh(x);
-                    RenderManager.getInstance().getTlineRender().setxHighligh(x);
-                    RenderManager.getInstance().getKlineRender().setyHighligh(y);
-                    RenderManager.getInstance().getTlineRender().setyHighligh(y);
-                    postInvalidate();
-
+                    EntryManager.getInstance().setPointHighlightX(false, x);
+                    EntryManager.getInstance().setPointHighlightY(-2f, y);
                     if (EntryManager.getInstance().isHighlightMove()) {
                         // Log.e("ooooooo1", "移动 ==> x = " + x + ", x1 = " + EntryManager.getInstance().getPointHighlightX()[0] + ", x2 = " + EntryManager.getInstance().getPointHighlightX()[1]);
-                        postInvalidate();
+                        invalidate();
 
-//                        if (null != listener) {
-//                            final int pointHighlight = EntryManager.getInstance().getPointHighlight();
-//                            final Entry entry = EntryManager.getInstance().getEntryList().get(pointHighlight);
-//                            listener.onHighlight(entry, pointHighlight, x, y);
-//                        }
+                        if (null != listener) {
+                            final int pointHighlight = EntryManager.getInstance().getPointHighlight();
+                            final Entry entry = EntryManager.getInstance().getEntryList().get(pointHighlight);
+                            listener.onHighlight(entry, pointHighlight, x, y);
+                        }
                     }
                 }
                 break;
@@ -183,24 +175,9 @@ public class StockChartView extends View {
                 onDragging = false;
 
                 // 取消高亮
-//                EntryManager.getInstance().setPointHighlightX(true, -1);
-//                EntryManager.getInstance().setPointHighlightY(-1f, -1f);
-//                invalidate();
-                RenderManager.getInstance().getKlineRender().setxHighligh(-1f);
-                RenderManager.getInstance().getTlineRender().setxHighligh(-1f);
-                RenderManager.getInstance().getKlineRender().setyHighligh(-1f);
-                RenderManager.getInstance().getTlineRender().setyHighligh(-1f);
-                postInvalidate();
-
-                // todo
-                if (canDragXoffset) {
-                    final int xoffsetRight = EntryManager.getInstance().getXoffsetRight();
-                    if (xoffsetRight != 0) {
-                        EntryManager.getInstance().setXoffsetRight(0);
-                        EntryManager.getInstance().setXoffsetLeft(0);
-                        postInvalidate();
-                    }
-                }
+                EntryManager.getInstance().setPointHighlightX(true, -1);
+                EntryManager.getInstance().setPointHighlightY(-1f, -1f);
+                invalidate();
                 break;
             }
         }
@@ -213,17 +190,17 @@ public class StockChartView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-       // Log.e("StockChartView", "onDraw");
+        Log.e("StockChartView", "onDraw");
 
         final int model = RenderManager.getInstance().getRenderModel();
 
         if (model == RenderManager.MODEL_TLINE_TURNOVER) {
 
-           // Log.e("StockChartView", "onDraw TLLINE");
+            Log.e("StockChartView", "onDraw TLLINE");
             RenderManager.getInstance().getTlineRender().onCanvas(canvas, onLongPress, model);
         } else if (model == RenderManager.MODEL_KLINE_TURNOVER) {
 
-          //  Log.e("StockChartView", "onDraw KLLINE");
+            Log.e("StockChartView", "onDraw KLLINE");
             RenderManager.getInstance().getKlineRender().onCanvas(canvas, onLongPress, model);
         }
     }
@@ -231,12 +208,13 @@ public class StockChartView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        Log.e("StockChartView", "onSizeChanged");
 
         int left = getLeft() + getPaddingLeft();
         int top = getTop() + getPaddingTop();
         int right = getRight() - getPaddingRight();
         int bottom = getBottom() - getPaddingBottom();
-      //  Log.e("StockChartView", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom);
+        Log.e("StockChartView", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom);
         RenderManager.getInstance().getKlineRender().onSizeChanged(left, top, right, bottom);
         RenderManager.getInstance().getTlineRender().onSizeChanged(left, top, right, bottom);
 
@@ -255,100 +233,100 @@ public class StockChartView extends View {
         }
     }
 
-//    @Override
-//    public void computeScroll() {
-//        if (onVerticalMove) {
-//            return;
-//        }
-//
-//        if (scroller.computeScrollOffset()) {
-//            final int x = scroller.getCurrX();
-//            final int dx = x - lastFlingX;
-//            lastFlingX = x;
-//
-//            if (onTouch) {
-//                scroller.abortAnimation();
-//            } else {
-//                if (KLINE_STATUS == KLINE_STATUS_RELEASE_BACK) {
-//                    // 更新滚动的距离，用于拖动松手后回中
-//                    RenderManager.getInstance().getKlineRender().updateCurrentTransX(dx);
-//                    RenderManager.getInstance().getKlineRender().updateOverScrollOffset(dx);
-//                    postInvalidate();
-//                } else if (KLINE_STATUS == KLINE_STATUS_SPRING_BACK) {
-//
-//                    // 更新滚动的距离，用于加载数据完成后滚动或者回中
-//                    if (EntryManager.getInstance().getEntryList().size() > lastEntrySize) {
-//
-//                        // 滚动
-//                        RenderManager.getInstance().getKlineRender().scroll(dx);
-//                        postInvalidate();
-//                    } else {
-//
-//                        // 更新滚动的距离，用于拖动松手后回中
-//                        RenderManager.getInstance().getKlineRender().updateCurrentTransX(dx);
-//                        RenderManager.getInstance().getKlineRender().updateOverScrollOffset(dx);
-//                        postInvalidate();
-//                    }
-//
-//                } else {
-//                    // 滚动
-//                    RenderManager.getInstance().getKlineRender().scroll(dx);
-//                    postInvalidate();
-//                }
-//            }
-//        } else {
-//            final float overScrollOffset = RenderManager.getInstance().getKlineRender().getOverScrollOffset();
-//
-//            if (!onTouch && overScrollOffset != 0 && KLINE_STATUS == KLINE_STATUS_IDLE) {
-//                lastScrollDx = 0;
-//                float dx = overScrollOffset;
-//
-//                if (Math.abs(overScrollOffset) > OVERSCROLL_THRESHOLD) {
-//                    if (enableLeftRefresh && overScrollOffset > 0) {
-//                        lastScrollDx = (int) overScrollOffset - OVERSCROLL_THRESHOLD;
-//
-//                        dx = lastScrollDx;
-//                    }
-//
-//                    if (enableRightRefresh && overScrollOffset < 0) {
-//                        lastScrollDx = (int) overScrollOffset + OVERSCROLL_THRESHOLD;
-//
-//                        dx = lastScrollDx;
-//                    }
-//                }
-//
-//                KLINE_STATUS = KLINE_STATUS_RELEASE_BACK;
-//                lastFlingX = 0;
-//                scroller.startScroll(0, 0, (int) dx, 0, OVERSCROLL_DURATION);
-//                // ViewCompat.postInvalidateOnAnimation(this);
-//
-//            } else if (KLINE_STATUS == KLINE_STATUS_RELEASE_BACK) {
-//                KLINE_STATUS = KLINE_STATUS_LOADING;
-//
-//                if (listener != null) {
-//                    lastEntrySize = EntryManager.getInstance().getEntryList().size();
-//                    if (lastScrollDx > 0) {
-//                        listener.onLeftRefresh();
-//                    } else if (lastScrollDx < 0) {
-//                        listener.onRightRefresh();
-//                    }
-//                } else {
-//                    // 加载完成
-//                    refreshComplete(false);
-//                }
-//            } else {
-//                KLINE_STATUS = KLINE_STATUS_IDLE;
-//            }
-//        }
-//    }
+    @Override
+    public void computeScroll() {
+        if (onVerticalMove) {
+            return;
+        }
+
+        if (scroller.computeScrollOffset()) {
+            final int x = scroller.getCurrX();
+            final int dx = x - lastFlingX;
+            lastFlingX = x;
+
+            if (onTouch) {
+                scroller.abortAnimation();
+            } else {
+                if (KLINE_STATUS == KLINE_STATUS_RELEASE_BACK) {
+                    // 更新滚动的距离，用于拖动松手后回中
+                    RenderManager.getInstance().getKlineRender().updateCurrentTransX(dx);
+                    RenderManager.getInstance().getKlineRender().updateOverScrollOffset(dx);
+                    postInvalidate();
+                } else if (KLINE_STATUS == KLINE_STATUS_SPRING_BACK) {
+
+                    // 更新滚动的距离，用于加载数据完成后滚动或者回中
+                    if (EntryManager.getInstance().getEntryList().size() > lastEntrySize) {
+
+                        // 滚动
+                        RenderManager.getInstance().getKlineRender().scroll(dx);
+                        postInvalidate();
+                    } else {
+
+                        // 更新滚动的距离，用于拖动松手后回中
+                        RenderManager.getInstance().getKlineRender().updateCurrentTransX(dx);
+                        RenderManager.getInstance().getKlineRender().updateOverScrollOffset(dx);
+                        postInvalidate();
+                    }
+
+                } else {
+                    // 滚动
+                    RenderManager.getInstance().getKlineRender().scroll(dx);
+                    postInvalidate();
+                }
+            }
+        } else {
+            final float overScrollOffset = RenderManager.getInstance().getKlineRender().getOverScrollOffset();
+
+            if (!onTouch && overScrollOffset != 0 && KLINE_STATUS == KLINE_STATUS_IDLE) {
+                lastScrollDx = 0;
+                float dx = overScrollOffset;
+
+                if (Math.abs(overScrollOffset) > OVERSCROLL_THRESHOLD) {
+                    if (enableLeftRefresh && overScrollOffset > 0) {
+                        lastScrollDx = (int) overScrollOffset - OVERSCROLL_THRESHOLD;
+
+                        dx = lastScrollDx;
+                    }
+
+                    if (enableRightRefresh && overScrollOffset < 0) {
+                        lastScrollDx = (int) overScrollOffset + OVERSCROLL_THRESHOLD;
+
+                        dx = lastScrollDx;
+                    }
+                }
+
+                KLINE_STATUS = KLINE_STATUS_RELEASE_BACK;
+                lastFlingX = 0;
+                scroller.startScroll(0, 0, (int) dx, 0, OVERSCROLL_DURATION);
+                // ViewCompat.postInvalidateOnAnimation(this);
+
+            } else if (KLINE_STATUS == KLINE_STATUS_RELEASE_BACK) {
+                KLINE_STATUS = KLINE_STATUS_LOADING;
+
+                if (listener != null) {
+                    lastEntrySize = EntryManager.getInstance().getEntryList().size();
+                    if (lastScrollDx > 0) {
+                        listener.onLeftRefresh();
+                    } else if (lastScrollDx < 0) {
+                        listener.onRightRefresh();
+                    }
+                } else {
+                    // 加载完成
+                    refreshComplete(false);
+                }
+            } else {
+                KLINE_STATUS = KLINE_STATUS_IDLE;
+            }
+        }
+    }
 
     /**********************************************************************************************/
 
     public void notifyDataSetChanged(List<Entry> entryData) {
 
         EntryManager.getInstance().addData(entryData);
+        RenderManager.getInstance().getKlineRender().caculateZoom();
         postInvalidate();
-
         Log.e("StockChartView", "notifyDataSetChanged");
     }
 
@@ -363,17 +341,13 @@ public class StockChartView extends View {
                 onLongPress = true;
 
                 // 高亮
-                final float x = e.getRawX();
-                final float y = e.getRawY();
-                Log.e("kaluyyyy", "onLongPress ==> x = " + x + ", y = " + y);
+                final float x = e.getX();
+                final float y = e.getY();
+                EntryManager.getInstance().setPointHighlightX(true, x);
+                EntryManager.getInstance().setPointHighlightY(y, y);
 
                 //  Log.e("ooooooo1", "长按 ==> x1 = " + EntryManager.getInstance().getPointHighlightX()[0] + ", x2 = " + EntryManager.getInstance().getPointHighlightX()[1]);
-                RenderManager.getInstance().getKlineRender().setxHighligh(x);
-                RenderManager.getInstance().getTlineRender().setxHighligh(x);
-                RenderManager.getInstance().getKlineRender().setyHighligh(y);
-                RenderManager.getInstance().getTlineRender().setyHighligh(y);
-
-                postInvalidate();
+                invalidate();
 
 //                if (null != listener) {
 //                    final int pointHighlight = EntryManager.getInstance().getPointHighlight();
@@ -401,174 +375,62 @@ public class StockChartView extends View {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            // Log.e("kaluyyyy", "onScroll ==> distanceX = " + distanceX);
 
-            if (e1.getPointerCount() != 1 || e2.getPointerCount() != 1) return false;
+            if (!onLongPress && !onDoubleFingerPress && !onVerticalMove) {
+                if (onDragging && !RenderManager.getInstance().getKlineRender().canScroll(distanceX) && RenderManager.getInstance().getKlineRender().canDragging(distanceX)) {
 
-            final int pointSum = EntryManager.getInstance().getEntryList().size();
-            if (pointSum == 0) return false;
-
-            if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
-
-                final int pointBegin = EntryManager.getInstance().getPointBegin();
-                final int pointEnd = EntryManager.getInstance().getPointEnd();
-
-                // 左划大于0
-                if (distanceX > 10f) {
-
+                    // 拖动，不同于滚动，当 K 线图到达边界时，依然可以滑动，用来支持加载更多
+//                    final KlineRender render = RenderManager.getInstance().getKlineRender();
+//                    if (render.getMaxScrollOffset() < 0 || distanceX < 0) {
+//                        render.updateCurrentTransX(distanceX);
+//                        render.updateOverScrollOffset(distanceX);
+//                        invalidate();
+//                    }
+                } else {
                     // 滚动
-                    if (pointEnd == pointSum && canDragXoffset) {
-
-                        final int offsetRight = EntryManager.getInstance().getXoffsetRight();
-                        final int xoffsetMax = EntryManager.getInstance().getXoffsetMax();
-                        if (Math.abs(offsetRight) >= xoffsetMax) {
-                            Log.e("rrrrr", "滑倒最右侧了");
-                            return false;
-                        }
-
-                        EntryManager.getInstance().setXoffsetRight((int) (offsetRight - distanceX));
-                        EntryManager.getInstance().setXoffsetLeft(0);
-                        // Log.e("rrrrr", "右侧刷新 ==> offsetRight = " + EntryManager.getInstance().getOffsetRight() + ", xoffsetMax = " + xoffsetMax);
-
-                        // RenderManager.getInstance().getKlineRender().caculateZoom();
-                        postInvalidate();
-                    } else {
-
-                        final int temp1 = pointEnd + 1;
-                        if (temp1 > pointSum) return false;
-
-                        final int temp2 = pointBegin + 1;
-                        if (temp2 <= 1) return false;
-
-                        EntryManager.getInstance().setPointEnd(temp1);
-                        EntryManager.getInstance().setPointBegin(temp2);
-                        postInvalidate();
-                    }
+                    RenderManager.getInstance().getKlineRender().scroll(distanceX);
+                    invalidate();
                 }
-                // 右划小于0
-                else if (distanceX < -10f) {
-
-                    if (pointBegin == 1 && canDragXoffset) {
-
-                        final int offsetLeft = EntryManager.getInstance().getXoffsetLeft();
-                        final int xoffsetMax = EntryManager.getInstance().getXoffsetMax();
-                        if (offsetLeft >= xoffsetMax) {
-
-                            Log.e("rrrrr", "滑倒最左侧了");
-                            return false;
-                        }
-
-                        Log.e("rrrrr", "左侧刷新");
-                        EntryManager.getInstance().setXoffsetLeft((int) (offsetLeft + distanceX));
-                        EntryManager.getInstance().setXoffsetRight(0);
-
-                        // RenderManager.getInstance().getKlineRender().caculateZoom();
-                        postInvalidate();
-                    } else {
-
-                        final int temp1 = pointEnd - 1;
-                        if (temp1 > pointSum) return false;
-
-                        final int temp2 = pointBegin - 1;
-                        if (temp2 <= 1) return false;
-
-                        EntryManager.getInstance().setPointEnd(temp1);
-                        EntryManager.getInstance().setPointBegin(temp2);
-                        postInvalidate();
-                    }
-                }
+                return true;
+            } else {
+                return false;
             }
-            return false;
         }
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            lastFlingX = 0;
+            if (!onLongPress && !onDoubleFingerPress && !onVerticalMove && RenderManager.getInstance().getKlineRender().canScroll(0)) {
 
-//            final int pointSum = EntryManager.getInstance().getEntryList().size();
-//            if (pointSum == 0) return super.onFling(e1, e2, velocityX, velocityY);
-//
-//            for (int i = 1; i < 100; i++) {
-//
-//                final int pointBegin = EntryManager.getInstance().getPointBegin();
-//                final int pointEnd = EntryManager.getInstance().getPointEnd();
-//
-//                final int temp1 = pointEnd - 1;
-//                if (temp1 > pointSum) return super.onFling(e1, e2, velocityX, velocityY);
-//
-//                final int temp2 = pointBegin - 1;
-//                if (temp2 <= 1) return super.onFling(e1, e2, velocityX, velocityY);
-//
-//                EntryManager.getInstance().setPointEnd(temp1);
-//                EntryManager.getInstance().setPointBegin(temp2);
-//                RenderManager.getInstance().getKlineRender().caculateZoom();
-//                postInvalidate();
-//
-//            }
-
-            return super.onFling(e1, e2, velocityX, velocityY);
+                scroller.fling(0, 0, (int) -velocityX, 0,
+                        Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                return true;
+            } else {
+                return false;
+            }
         }
     });
 
+    private float lastScale = 1f;
     private final ScaleGestureDetector scaleDetector = new ScaleGestureDetector(getContext(), new ScaleGestureDetector.SimpleOnScaleGestureListener() {
 
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
 
-            // K线图才会缩放
             if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
-                float f = detector.getScaleFactor();
+                float temp = detector.getScaleFactor();
+                //Log.e("kalurrrrr", "onScale ==> " + temp);
 
-                if (f < 1.0f) {
-                    Log.e("yt", "onScale ==> 缩小 " + f);
-
-
-                    final int pointSum = EntryManager.getInstance().getEntryList().size();
-                    //  Log.e("yt", "缩小 ==> pointSum = " + pointSum);
-                    if (pointSum == 0) return super.onScale(detector);
-
-                    final int pointEnd = EntryManager.getInstance().getPointEnd();
-                    // Log.e("yt", "缩小 ==> pointEnd = " + pointEnd);
-                    if (pointEnd == pointSum) return super.onScale(detector);
-
-                    final int pointCount = EntryManager.getInstance().getPointCount();
-//                    final int pointMax = EntryManager.getInstance().getPointMax();
-//                    final int pointMin = EntryManager.getInstance().getPointMin();
-//                   // Log.e("yt", "缩小 ==> pointCount = " + pointCount + ", pointMax = " + pointMax + ", pointMin = " + pointMin);
-//                    if (pointCount >= pointMax || pointCount <= pointMin) return super.onScale(detector);
-
-                    final int tempCount = pointCount + 2;
-                    EntryManager.getInstance().setPointCount(tempCount);
-                    final int pointBegin = EntryManager.getInstance().getPointBegin();
-                    EntryManager.getInstance().setPointBegin(pointBegin - 1);
-                    EntryManager.getInstance().setPointEnd(pointEnd + 1);
-
-                    postInvalidate();
-
-                } else if (f > 1.0f) {
-                    Log.e("yt", "onScale ==> 放大 " + f);
-
-                    final int pointSum = EntryManager.getInstance().getEntryList().size();
-                    // Log.e("yt", "addZoom ==> pointSum = " + pointSum);
-                    if (pointSum == 0) return super.onScale(detector);
-
-                    final int pointEnd = EntryManager.getInstance().getPointEnd();
-                    //  Log.e("yt", "addZoom ==> pointEnd = " + pointEnd);
-                    if (pointEnd == pointSum) return super.onScale(detector);
-
-                    final int pointCount = EntryManager.getInstance().getPointCount();
-//                    final int pointMax = EntryManager.getInstance().getPointMax();
-//                    final int pointMin = EntryManager.getInstance().getPointMin();
-//                 //   Log.e("yt", "addZoom ==> pointCount = " + pointCount + ", pointMax = " + pointMax + ", pointMin = " + pointMin);
-//                    if (pointCount >= pointMax || pointCount <= pointMin)
-//                        return super.onScale(detector);
-
-                    final int tempCount = pointCount - 2;
-                    EntryManager.getInstance().setPointCount(tempCount);
-                    final int pointBegin = EntryManager.getInstance().getPointBegin();
-                    EntryManager.getInstance().setPointBegin(pointBegin + 1);
-                    EntryManager.getInstance().setPointEnd(pointEnd - 1);
-
-                    postInvalidate();
+                if (Math.abs(Math.abs(lastScale) - Math.abs(temp)) > 0.1f) {
+                    if (temp < 1.0f) {
+                        RenderManager.getInstance().getKlineRender().minusZoom((int) detector.getFocusX());
+                        lastScale = temp;
+                        invalidate();
+                    } else if (temp > 1.0f) {
+                        RenderManager.getInstance().getKlineRender().addZoom((int) detector.getFocusX());
+                        lastScale = temp;
+                        invalidate();
+                    }
                 }
             }
 
@@ -584,12 +446,12 @@ public class StockChartView extends View {
      * @param reverse 是否反转滚动的方向
      */
     public void refreshComplete(boolean reverse) {
-//        final int overScrollOffset = (int) RenderManager.getInstance().getKlineRender().getOverScrollOffset();
-//
-//        if (overScrollOffset == 0) return;
-//        KLINE_STATUS = KLINE_STATUS_SPRING_BACK;
-//        lastFlingX = 0;
-//        scroller.startScroll(0, 0, reverse ? -overScrollOffset : overScrollOffset, 0, OVERSCROLL_DURATION);
+        final int overScrollOffset = (int) RenderManager.getInstance().getKlineRender().getOverScrollOffset();
+
+        if (overScrollOffset == 0) return;
+        KLINE_STATUS = KLINE_STATUS_SPRING_BACK;
+        lastFlingX = 0;
+        scroller.startScroll(0, 0, reverse ? -overScrollOffset : overScrollOffset, 0, OVERSCROLL_DURATION);
     }
 
     /**********************************************************************************************/

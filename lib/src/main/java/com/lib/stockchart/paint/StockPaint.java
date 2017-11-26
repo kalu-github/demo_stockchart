@@ -14,8 +14,6 @@ public class StockPaint {
     public static int STOCK_GREEN = Color.parseColor("#64C67A");
     public static int STOCK_GRAY = Color.parseColor("#999999");
 
-    public static int PAINT_WIDTH_TURNOVER = 4;
-
     private final static Paint mPaint = new Paint();
 
     /**
@@ -81,7 +79,7 @@ public class StockPaint {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setFakeBoldText(true);
         mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mPaint.setStrokeWidth(PAINT_WIDTH_TURNOVER);
+        mPaint.setStrokeWidth(4);
         mPaint.setTextAlign(Paint.Align.LEFT);
         mPaint.setTextSize(1);
         mPaint.setPathEffect(null);
