@@ -1,4 +1,4 @@
-![image](https://github.com/153437803/StockChart_v1.0/blob/master/Screenrecorder-2017-11-22-21-45-58-295_20171122220313.gif )  
+![image](https://github.com/153437803/StockChart/blob/develop/Screenrecorder-2017-11-22-21-45-58-295_20171122220313.gif )  
 
 ```
     <declare-styleable name="StockChartView">
@@ -31,16 +31,11 @@
             app:scv_weight_down="1"
             app:scv_weight_top="4" />
 ```
-
-```
-存在问题：
-
-1.滑动
-2.高亮
-3.横竖屏切换，无画面
-```
 ```
 todo list：
 
 1.rsi mal 分时图
+1.滑动
+2.高亮
+3.横竖屏切换，无画面
 ```
