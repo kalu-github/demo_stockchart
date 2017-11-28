@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class EntryManager {
 
-//    // 图标边框和信息的内边距
+    //    // 图标边框和信息的内边距
 //    private float boardPadding = 10f;
     // 上部权重
     private int weightTop = 5;
@@ -188,7 +188,10 @@ public class EntryManager {
         float temp = 0;
 
         for (int i = start; i <= end; i++) {
+
             Entry entry = entries.get(i);
+            if (null == entry) continue;
+
             final float ma5 = entry.getMa5();
             final float ma10 = entry.getMa10();
             final float ma20 = entry.getMa20();

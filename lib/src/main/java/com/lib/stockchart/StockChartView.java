@@ -33,8 +33,8 @@ import static android.content.Context.VIBRATOR_SERVICE;
 public class StockChartView extends View {
 
     // 下标索引信息(更新数据, 左右滑动, 放大缩小)
-    private int indexEnd = -1; // 结束下标索引
-    private int indexBegin = -1; // 起始下标索引
+    private int indexEnd = 0; // 结束下标索引
+    private int indexBegin = 0; // 起始下标索引
     private int indexCount = 50; // 默认显示50个点
     private int indexMax = 0; // 真实索引最大值
 
@@ -189,7 +189,7 @@ public class StockChartView extends View {
 
         if (model == RenderManager.MODEL_TLINE_TURNOVER) {
             // Log.e("StockChartView", "onDraw TLLINE");
-            RenderManager.getInstance().getTlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, 0, 0, loadingStr, xlabelHeight, boardPadding);
+            RenderManager.getInstance().getTlineRender().onCanvas(canvas, 0, indexMax, indexMax, indexMax, 0, 0, loadingStr, xlabelHeight, boardPadding);
         } else if (model == RenderManager.MODEL_KLINE_TURNOVER) {
             //  Log.e("StockChartView", "onDraw KLLINE");
             RenderManager.getInstance().getKlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, xoffsetLeft, xoffsetRight, loadingStr, xlabelHeight, boardPadding);
@@ -310,14 +310,28 @@ public class StockChartView extends View {
 
     /**********************************************************************************************/
 
+    public void clearDataSetChanged() {
+        EntryManager.getInstance().resetData();
+        indexBegin = 0;
+        indexMax = 0;
+        indexEnd = 0;
+    }
+
     public void notifyDataSetChanged(List<Entry> entryData) {
 
         if (null == entryData || entryData.size() == 0) return;
 
         // 1.计算下标索引
-        indexEnd = entryData.size() - 1;
-        indexBegin = indexEnd - indexCount + 1;
-        indexMax = entryData.size() - 1;
+        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
+            indexBegin = 0;
+            indexMax = entryData.size() - 1;
+            indexEnd = indexMax;
+        } else {
+            indexEnd = entryData.size() - 1;
+            indexBegin = indexEnd - indexCount + 1;
+            indexMax = entryData.size() - 1;
+        }
+
         // 2.填充数据
         EntryManager.getInstance().addData(entryData);
         // 3.界面刷新

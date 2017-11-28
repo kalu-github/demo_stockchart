@@ -43,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 RenderManager.getInstance().setRenderModel(RenderManager.MODEL_KLINE_TURNOVER);
-                EntryManager.getInstance().resetData();
                 final StockChartView mStockChartView = findViewById(R.id.kLineLayout);
+                mStockChartView.clearDataSetChanged();
                 mStockChartView.postInvalidate();
 
                 loadData();
@@ -54,9 +54,10 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.b).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 RenderManager.getInstance().setRenderModel(RenderManager.MODEL_TLINE_TURNOVER);
-                EntryManager.getInstance().resetData();
                 final StockChartView mStockChartView = findViewById(R.id.kLineLayout);
+                mStockChartView.clearDataSetChanged();
                 mStockChartView.postInvalidate();
 
                 loadData();
@@ -64,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         final StockChartView mStockChartView = findViewById(R.id.kLineLayout);
-        mStockChartView.setOnStockChartChangeListener(new OnStockChartChangeListenerSimple(){
+        mStockChartView.setOnStockChartChangeListener(new OnStockChartChangeListenerSimple() {
 
             @Override
             public void onLeftRefresh() {

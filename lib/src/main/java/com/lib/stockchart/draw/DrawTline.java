@@ -161,7 +161,7 @@ public class DrawTline implements IDraw {
         }
 
         if (!TextUtils.isEmpty(str)) {
-            canvas.drawText(str, width / 2, heightF / 2, StockPaint.getTextPaint(Paint.Align.CENTER, 30));
+            canvas.drawText(str, right - width / 2, bottomF - heightF / 2, StockPaint.getTextPaint(Paint.Align.CENTER, 30));
         } else {
 
             List<Entry> entryList = EntryManager.getInstance().getEntryList();
