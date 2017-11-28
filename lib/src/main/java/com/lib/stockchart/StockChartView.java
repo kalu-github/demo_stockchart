@@ -40,6 +40,9 @@ public class StockChartView extends View {
     // 自定义属性
     private int pointCountMin = 70;
     private int pointCountMax = 26;
+    private float xoffsetLeft = 0f;
+    private float xoffsetRight = 0f;
+    private float xoffsetMax = 100f;
 
     // 时间戳
 //    private long timestamp = System.currentTimeMillis();
@@ -90,6 +93,7 @@ public class StockChartView extends View {
             indexCount = a.getInt(R.styleable.StockChartView_scv_point_count, 50);
             pointCountMax = a.getInt(R.styleable.StockChartView_scv_point_max, 75);
             pointCountMin = a.getInt(R.styleable.StockChartView_scv_point_min, 25);
+            xoffsetMax = a.getDimension(R.styleable.StockChartView_scv_xoffset_max, 100f);
 
             int weightTop = a.getInt(R.styleable.StockChartView_scv_weight_top, 5);
             EntryManager.getInstance().setWeightTop(weightTop);
@@ -97,14 +101,12 @@ public class StockChartView extends View {
             EntryManager.getInstance().setWeightDown(weightDown);
             String hintLoad = a.getString(R.styleable.StockChartView_scv_hint_load);
             EntryManager.getInstance().setHintLoadStr(hintLoad);
-            int pointSpace = a.getDimensionPixelSize(R.styleable.StockChartView_scv_point_space, 10);
+            float pointSpace = a.getDimension(R.styleable.StockChartView_scv_point_space, 10f);
             EntryManager.getInstance().setPointSpace(pointSpace);
             final int boardPadding = a.getDimensionPixelSize(R.styleable.StockChartView_scv_board_padding, 5);
             EntryManager.getInstance().setBoardPadding(boardPadding);
             final int xlabelHeight = a.getDimensionPixelSize(R.styleable.StockChartView_scv_xlabel_height, 25);
             EntryManager.getInstance().setXlabelHeight(xlabelHeight);
-            final int xoffsetMax = a.getDimensionPixelSize(R.styleable.StockChartView_scv_xoffset_max, 100);
-            EntryManager.getInstance().setXoffsetMax(xoffsetMax);
 
             canDragXoffset = a.getBoolean(R.styleable.StockChartView_scv_xoffset_enable, false);
 
@@ -161,10 +163,9 @@ public class StockChartView extends View {
 
                 // todo
                 if (canDragXoffset) {
-                    final int xoffsetRight = EntryManager.getInstance().getXoffsetRight();
                     if (xoffsetRight != 0) {
-                        EntryManager.getInstance().setXoffsetRight(0);
-                        EntryManager.getInstance().setXoffsetLeft(0);
+                        xoffsetLeft = 0f;
+                        xoffsetRight = 0f;
                         postInvalidate();
                     }
                 }
@@ -186,10 +187,10 @@ public class StockChartView extends View {
 
         if (model == RenderManager.MODEL_TLINE_TURNOVER) {
             // Log.e("StockChartView", "onDraw TLLINE");
-            RenderManager.getInstance().getTlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax);
+            RenderManager.getInstance().getTlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, 0, 0);
         } else if (model == RenderManager.MODEL_KLINE_TURNOVER) {
             //  Log.e("StockChartView", "onDraw KLLINE");
-            RenderManager.getInstance().getKlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax);
+            RenderManager.getInstance().getKlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, xoffsetLeft, xoffsetRight);
         }
     }
 
@@ -379,18 +380,13 @@ public class StockChartView extends View {
                     // 滚动
                     if (indexEnd == indexMax && canDragXoffset) {
 
-                        final int offsetRight = EntryManager.getInstance().getXoffsetRight();
-                        final int xoffsetMax = EntryManager.getInstance().getXoffsetMax();
-                        if (Math.abs(offsetRight) >= xoffsetMax) {
+                        if (Math.abs(xoffsetRight) >= xoffsetMax) {
                             Log.e("rrrrr", "滑倒最右侧了");
                             return false;
                         }
 
-                        EntryManager.getInstance().setXoffsetRight((int) (offsetRight - distanceX));
-                        EntryManager.getInstance().setXoffsetLeft(0);
-                        // Log.e("rrrrr", "右侧刷新 ==> offsetRight = " + EntryManager.getInstance().getOffsetRight() + ", xoffsetMax = " + xoffsetMax);
-
-                        // RenderManager.getInstance().getKlineRender().caculateZoom();
+                        xoffsetRight = xoffsetRight - distanceX;
+                        xoffsetLeft = 0;
                         postInvalidate();
                     } else {
 
@@ -410,19 +406,15 @@ public class StockChartView extends View {
 
                     if (indexBegin <= 0 && canDragXoffset) {
 
-                        final int offsetLeft = EntryManager.getInstance().getXoffsetLeft();
-                        final int xoffsetMax = EntryManager.getInstance().getXoffsetMax();
-                        if (offsetLeft >= xoffsetMax) {
+                        if (xoffsetLeft >= xoffsetMax) {
 
                             Log.e("rrrrr", "滑倒最左侧了");
                             return false;
                         }
 
                         Log.e("rrrrr", "左侧刷新");
-                        EntryManager.getInstance().setXoffsetLeft((int) (offsetLeft + distanceX));
-                        EntryManager.getInstance().setXoffsetRight(0);
-
-                        // RenderManager.getInstance().getKlineRender().caculateZoom();
+                        xoffsetLeft = xoffsetLeft + distanceX;
+                        xoffsetRight = 0;
                         postInvalidate();
                     } else {
 

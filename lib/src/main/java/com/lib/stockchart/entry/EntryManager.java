@@ -14,7 +14,7 @@ import java.util.List;
 public class EntryManager {
 
     // 图标边框和信息的内边距
-    private int boardPadding = 10;
+    private float boardPadding = 10f;
     // 加载提示信息
     private String hintLoadStr = "正在加载数据中...";
     // 上部权重
@@ -22,40 +22,13 @@ public class EntryManager {
     // 下部权重
     private int weightDown = 2;
     // 每个点之间的空隙
-    private int pointSpace = 10;
+    private float pointSpace = 10f;
     // 每个点的宽度
     private int pointWidth = 10;
     // x轴显示文本区域高度
-    private int xlabelHeight = 50;
-    private int xoffsetLeft = 0;
-    private int xoffsetRight = 0;
-    private int xoffsetMax = 100;
+    private float xlabelHeight = 50f;
 
-    public int getXoffsetMax() {
-        return xoffsetMax;
-    }
-
-    public void setXoffsetMax(int xoffsetMax) {
-        this.xoffsetMax = xoffsetMax;
-    }
-
-    public int getXoffsetLeft() {
-        return xoffsetLeft;
-    }
-
-    public void setXoffsetLeft(int xoffsetLeft) {
-        this.xoffsetLeft = xoffsetLeft;
-    }
-
-    public int getXoffsetRight() {
-        return xoffsetRight;
-    }
-
-    public void setXoffsetRight(int xoffsetRight) {
-        this.xoffsetRight = xoffsetRight;
-    }
-
-    public int getXlabelHeight() {
+    public float getXlabelHeight() {
         return xlabelHeight;
     }
 
@@ -77,19 +50,19 @@ public class EntryManager {
     // 高亮点, Y坐标索引(第一个上一次, 第二个最新的)
     private volatile float[] pointHighlightY = new float[]{-1, -1};
 
-    public int getPointSpace() {
+    public float getPointSpace() {
         return pointSpace;
     }
 
-    public void setPointSpace(int pointSpace) {
+    public void setPointSpace(float pointSpace) {
         this.pointSpace = pointSpace;
     }
 
-    public int getBoardPadding() {
+    public float getBoardPadding() {
         return boardPadding;
     }
 
-    public void setBoardPadding(int boardPadding) {
+    public void setBoardPadding(float boardPadding) {
         this.boardPadding = boardPadding;
     }
 

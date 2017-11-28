@@ -18,7 +18,7 @@ import java.util.List;
 public class KlineRender extends BaseRender {
 
     @Override
-    public void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexMax) {
+    public void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexMax, float xoffsetLeft, float xoffsetRight) {
         Log.e("KlineRender", "onCanvas");
 
         final List<IDraw> drawList = getDrawList();
@@ -38,7 +38,7 @@ public class KlineRender extends BaseRender {
 
             for (int i = 0; i < drawList.size(); i++) {
                 final IDraw temp = drawList.get(i);
-                temp.onDrawData(this, canvas, indexCount, indexBegin, indexEnd, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh());
+                temp.onDrawData(this, canvas, indexCount, indexBegin, indexEnd, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight);
             }
         }
     }

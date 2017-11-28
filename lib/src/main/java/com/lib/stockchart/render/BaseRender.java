@@ -71,47 +71,42 @@ public abstract class BaseRender {
         final int weightSum = weightTop + weightDown;
 
         // 内边框边距
-        final int boardPadding = EntryManager.getInstance().getBoardPadding();
-        final int xlabelHeight = EntryManager.getInstance().getXlabelHeight();
+        final float boardPadding = EntryManager.getInstance().getBoardPadding();
+        final float xlabelHeight = EntryManager.getInstance().getXlabelHeight();
         final float bottomSrc = height / weightSum * weightTop - boardPadding - xlabelHeight;
         final float heightSrc = bottomSrc - top - boardPadding;
 
-        final float priceMin = EntryManager.getInstance().calculatePriceMin(indexBegin, indexEnd);
-        final float priceMax = EntryManager.getInstance().calculatePriceMax(indexBegin, indexEnd);
-        final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexEnd);
-        float priceSum = priceMax - priceMin;
-
-        // Log.e("BaseRender", "caculateZoom ==> pointCount = " + pointCount);
-
         // 点与点间隙
-        final int pointSpace = EntryManager.getInstance().getPointSpace();
+        final float pointSpace = EntryManager.getInstance().getPointSpace();
         // 每个点宽度
-        final int pointWidth = (width - 2 * boardPadding - (indexCount - 1) * pointSpace) / indexCount;
-        EntryManager.getInstance().setPointWidth(pointWidth);
+        final float pointWidth = (width - 2 * boardPadding - (indexCount - 1) * pointSpace) / indexCount;
+        EntryManager.getInstance().setPointWidth((int) pointWidth);
 
         final List<Entry> entryList = EntryManager.getInstance().getEntryList();
 
-//        final int offsetLeft = EntryManager.getInstance().getOffsetLeft();
-//        final int offsetRight = EntryManager.getInstance().getOffsetRight();
-        final int realBegin = left + boardPadding;
+        final float realBegin = left + boardPadding;
+        final float realEnd = right - boardPadding - pointWidth;
 
         for (int i = indexBegin; i <= indexEnd; i++) {
 
             final Entry entry = entryList.get(i);
 
+            // 1.计算真实X轴坐标
             if (i == indexBegin) {
-                // Log.e("KlineRender", "1temp = " + realBegin + ", pointWidth = " + pointWidth + ", pointSpace = " + pointSpace);
                 entry.setxLabelReal(realBegin);
             } else if (i == indexEnd) {
-                final int realEnd = right - boardPadding - pointWidth;
-                //  Log.e("KlineRender", "3temp = " + realEnd + ", pointWidth = " + pointWidth + ", pointSpace = " + pointSpace);
                 entry.setxLabelReal(realEnd);
             } else {
-                int temp = realBegin + (i - indexBegin) * (pointWidth + pointSpace);
+                float temp = realBegin + (i - indexBegin) * (pointWidth + pointSpace);
                 //   Log.e("KlineRender", "2temp = " + temp + ", pointWidth = " + pointWidth + ", pointSpace = " + pointSpace);
                 entry.setxLabelReal(temp);
             }
 
+            // 2.计算真实Y轴坐标
+            final float priceMin = EntryManager.getInstance().calculatePriceMin(indexBegin, indexEnd);
+            final float priceMax = EntryManager.getInstance().calculatePriceMax(indexBegin, indexEnd);
+            final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexEnd);
+            float priceSum = priceMax - priceMin;
             // 价格
             entry.setOpenReal(bottomSrc - (entry.getOpen() - priceMin) * heightSrc / priceSum);
             entry.setCloseReal(bottomSrc - (entry.getClose() - priceMin) * heightSrc / priceSum);
@@ -120,7 +115,6 @@ public abstract class BaseRender {
             entry.setMa5Real(bottomSrc - (entry.getMa5() - priceMin) * heightSrc / priceSum);
             entry.setMa10Real(bottomSrc - (entry.getMa10() - priceMin) * heightSrc / priceSum);
             entry.setMa20Real(bottomSrc - (entry.getMa20() - priceMin) * heightSrc / priceSum);
-
             // 成交量
             entry.setVolumeReal((int) (bottomSrc - entry.getVolume() * height / turnoverMax));
             entry.setVolumeMa5Real((int) (bottomSrc - entry.getVolumeMa5() * height / turnoverMax));
@@ -134,7 +128,7 @@ public abstract class BaseRender {
 
     /**********************************************************************************************/
 
-    public abstract void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexCountMax);
+    public abstract void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexCountMax, float xoffsetLeft, float xoffsetRight);
 
     public void clearData() {
         mDrawList.clear();

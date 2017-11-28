@@ -81,7 +81,7 @@ public class DrawTurnover implements IDraw {
     }
 
     @Override
-    public void onDrawData(BaseRender render, Canvas canvas, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh) {
+    public void onDrawData(BaseRender render, Canvas canvas, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight) {
 
         canvas.save();
 
@@ -113,10 +113,6 @@ public class DrawTurnover implements IDraw {
             float stopY = bottom1 + SPACE;
             canvas.drawLine(x, startY, x, stopY, StockPaint.getDashPaint());
         }
-
-
-        final int offsetLeft = EntryManager.getInstance().getXoffsetLeft();
-        final int offsetRight = EntryManager.getInstance().getXoffsetRight();
 
         // 2.成交量
         // 2.设置画笔颜色
@@ -157,7 +153,7 @@ public class DrawTurnover implements IDraw {
                 }
             }
 
-            float left = entry.getxLabelReal() + offsetLeft + offsetRight;
+            float left = entry.getxLabelReal() + xoffsetLeft + xoffsetRight;
             float right = left + pointWidth;
             float bottom = mRectF.bottom;
             float top = bottom - entry.getVolume() * mRectF.height() / maxTurnover;
@@ -198,7 +194,7 @@ public class DrawTurnover implements IDraw {
         final Entry entryEnd = entryList.get(pointEnd - 1);
         final float xEnd = entryEnd.getxLabelReal() + pointWidth / 2;
 
-        final int boardPadding = EntryManager.getInstance().getBoardPadding();
+        final float boardPadding = EntryManager.getInstance().getBoardPadding();
 
         if (xHighligh <= xBegin) {
             // 横线
@@ -217,11 +213,11 @@ public class DrawTurnover implements IDraw {
             for (int i = pointBegin; i < Math.min(pointEnd, pointBegin + pointCount); i++) {
 
                 final Entry entry1 = entryList.get(i);
-                final int tempx1 = entry1.getxLabelReal();
+                final float tempx1 = entry1.getxLabelReal();
                 final float x1 = tempx1 + pointWidth / 2;
 
                 final Entry entry2 = entryList.get(i + 1);
-                final int tempx2 = entry2.getxLabelReal();
+                final float tempx2 = entry2.getxLabelReal();
                 final float x2 = tempx2 + pointWidth / 2;
 
                 if (xHighligh > x1 && xHighligh < x2) {
@@ -239,14 +235,11 @@ public class DrawTurnover implements IDraw {
     /**
      * MAD
      */
-    private void drawMadline(Canvas canvas, int pointCount, int pointBegin, int pointEnd) {
+    private void drawMadline(Canvas canvas, int pointCount, int pointBegin, int pointEnd, float xoffsetLeft, float xoffsetRight) {
 
         final List<Entry> entryList = EntryManager.getInstance().getEntryList();
-        final int pointWidth = EntryManager.getInstance().getPointWidth();
-        final int boardPadding = EntryManager.getInstance().getBoardPadding();
-
-        final int offsetLeft = EntryManager.getInstance().getXoffsetLeft();
-        final int offsetRight = EntryManager.getInstance().getXoffsetRight();
+        final float pointWidth = EntryManager.getInstance().getPointWidth();
+        final float boardPadding = EntryManager.getInstance().getBoardPadding();
 
         // 5日均线
         final float[] pts5 = new float[(pointCount+1) * 4];
@@ -257,8 +250,8 @@ public class DrawTurnover implements IDraw {
 
             final Entry entry = entryList.get(i);
 
-            final int tempx = entry.getxLabelReal();
-            final float x = tempx + pointWidth / 2 + offsetLeft + offsetRight;
+            final float tempx = entry.getxLabelReal();
+            final float x = tempx + pointWidth / 2 + xoffsetLeft + xoffsetRight;
             final float y1 = mRectF.top + entry.getVolumeMa5Real() + boardPadding;
             final float y2 = mRectF.top + entry.getVolumeMa10Real() + boardPadding;
             // Log.e("uuuu", "i = " + (i - 1) + ", x = " + x + ", y1 = " + y1 + ", y2 = " + y2);

@@ -61,7 +61,7 @@ public class DrawTline implements IDraw {
     }
 
     @Override
-    public void onDrawData(BaseRender render, Canvas canvas, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh) {
+    public void onDrawData(BaseRender render, Canvas canvas, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight) {
         //  Log.e("DrawKline", "onDrawData ==> pointSum = " + pointSum + ", pointBegin = " + pointBegin + ", pointEnd = " + pointEnd + ", minPrice = " + minPrice + ", maxPrice = " + maxPrice + ", maxTurnover = " + maxTurnover);
 
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER)
@@ -97,7 +97,7 @@ public class DrawTline implements IDraw {
 //            EntryManager.getInstance().setPointHighlight(pointIndex);
 
 //            final float y = EntryManager.getInstance().getPointHighlightY()[1];
-        final int boardPadding = EntryManager.getInstance().getBoardPadding();
+        final float boardPadding = EntryManager.getInstance().getBoardPadding();
         // 横线
         canvas.drawLine(left + boardPadding, yHighligh, right - boardPadding, yHighligh, StockPaint.getLinePaint(Color.BLACK));
         // 竖线
@@ -116,9 +116,9 @@ public class DrawTline implements IDraw {
     private void drawBackground(Canvas canvas, int entryCount, int entryBegin, int entryEnd, boolean nullData) {
 
         // X轴显示区域高度
-        final int xlabelHeight = EntryManager.getInstance().getXlabelHeight();
+        final float xlabelHeight = EntryManager.getInstance().getXlabelHeight();
         // 图标边框和信息的内边距
-        final int SPACE = EntryManager.getInstance().getBoardPadding();
+        final float SPACE = EntryManager.getInstance().getBoardPadding();
         canvas.drawRect(left - SPACE, top - SPACE, right + SPACE, bottomF + SPACE - xlabelHeight, StockPaint.getBorderPaint(3));
 
         // 4条横线 - 虚线
@@ -209,7 +209,7 @@ public class DrawTline implements IDraw {
 
             final Entry entry = entryList.get(i);
 
-            final int tempx = entry.getxLabelReal();
+            final float tempx = entry.getxLabelReal();
             final float x = tempx + pointWidth / 2;
             final float y1 = entry.getMa5Real();
             final float y2 = entry.getMa10Real();

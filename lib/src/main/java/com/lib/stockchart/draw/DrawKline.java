@@ -59,7 +59,7 @@ public class DrawKline implements IDraw {
     }
 
     @Override
-    public void onDrawData(BaseRender render, Canvas canvas, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh) {
+    public void onDrawData(BaseRender render, Canvas canvas, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight) {
         //  Log.e("DrawKline", "onDrawData ==> pointSum = " + pointSum + ", pointBegin = " + pointBegin + ", pointEnd = " + pointEnd + ", minPrice = " + minPrice + ", maxPrice = " + maxPrice + ", maxTurnover = " + maxTurnover);
 
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
@@ -71,9 +71,9 @@ public class DrawKline implements IDraw {
         // 1.边框
         drawBackground(canvas, pointCount, pointBegin, pointEnd, false);
         // 2.K线
-        drawKline(canvas, pointBegin, pointEnd);
+        drawKline(canvas, pointBegin, pointEnd, xoffsetLeft, xoffsetRight);
         // 3.mad
-        drawMadline(canvas, pointCount, pointBegin, pointEnd);
+        drawMadline(canvas, pointCount, pointBegin, pointEnd, xoffsetLeft, xoffsetRight);
         // 4.价格
         drawPrice(canvas, minPrice, maxPrice);
         // 高亮坐标
@@ -100,7 +100,7 @@ public class DrawKline implements IDraw {
         final float xEnd = entryEnd.getxLabelReal() + pointWidth / 2;
         Log.e("DrawKline", "drawHightlight ==> xBegin = " + xBegin + ", xEnd = " + xEnd);
 
-        final int boardPadding = EntryManager.getInstance().getBoardPadding();
+        final float boardPadding = EntryManager.getInstance().getBoardPadding();
 
         if (xHighligh <= xBegin) {
             // 横线
@@ -119,11 +119,11 @@ public class DrawKline implements IDraw {
             for (int i = pointBegin; i < Math.min(pointEnd, pointBegin + pointCount); i++) {
 
                 final Entry entry1 = entryList.get(i);
-                final int tempx1 = entry1.getxLabelReal();
+                final float tempx1 = entry1.getxLabelReal();
                 final float x1 = tempx1 + pointWidth / 2;
 
                 final Entry entry2 = entryList.get(i + 1);
-                final int tempx2 = entry2.getxLabelReal();
+                final float tempx2 = entry2.getxLabelReal();
                 final float x2 = tempx2 + pointWidth / 2;
 
                 if (xHighligh > x1 && xHighligh < x2) {
@@ -144,9 +144,9 @@ public class DrawKline implements IDraw {
     private void drawBackground(Canvas canvas, int entryCount, int entryBegin, int entryEnd, boolean nullData) {
 
         // X轴显示区域高度
-        final int xlabelHeight = EntryManager.getInstance().getXlabelHeight();
+        final float xlabelHeight = EntryManager.getInstance().getXlabelHeight();
         // 图标边框和信息的内边距
-        final int SPACE = EntryManager.getInstance().getBoardPadding();
+        final float SPACE = EntryManager.getInstance().getBoardPadding();
         canvas.drawRect(left - SPACE, top - SPACE, right + SPACE, bottomF + SPACE - xlabelHeight, StockPaint.getBorderPaint(3));
 
         // 4条横线 - 虚线
@@ -221,7 +221,7 @@ public class DrawKline implements IDraw {
     /**
      * 蜡烛图
      */
-    private void drawKline(Canvas canvas, int pointBegin, int pointEnd) {
+    private void drawKline(Canvas canvas, int pointBegin, int pointEnd, float xoffsetLeft, float xoffsetRight) {
 
         List<Entry> entryList = EntryManager.getInstance().getEntryList();
 
@@ -230,9 +230,6 @@ public class DrawKline implements IDraw {
         // 画笔宽度
         StockPaint.setPaintWidth(5);
 
-        final int offsetLeft = EntryManager.getInstance().getXoffsetLeft();
-        final int offsetRight = EntryManager.getInstance().getXoffsetRight();
-
         for (int i = pointBegin; i <= pointEnd; i++) {
             Entry entry = entryList.get(i);
 
@@ -240,7 +237,7 @@ public class DrawKline implements IDraw {
             final float top = entry.getOpen() > entry.getClose() ? entry.getOpenReal() : entry.getCloseReal();
             final float bottom = entry.getOpen() > entry.getClose() ? entry.getCloseReal() : entry.getOpenReal();
 
-            float left = entry.getxLabelReal() + offsetLeft + offsetRight;
+            float left = entry.getxLabelReal() + xoffsetLeft + xoffsetRight;
             float right = left + pointWidth;
             // Log.e("DrawKline", "drawKline ==> pointBegin = " + pointBegin + ", pointEnd = " + pointEnd + ", left = " + left + ", right = " + right);
 
@@ -264,27 +261,24 @@ public class DrawKline implements IDraw {
     /**
      * MAD
      */
-    private void drawMadline(Canvas canvas, int pointCount, int pointBegin, int pointEnd) {
+    private void drawMadline(Canvas canvas, int pointCount, int pointBegin, int pointEnd, float xoffsetLeft, float xoffsetRight) {
 
         final List<Entry> entryList = EntryManager.getInstance().getEntryList();
         final int pointWidth = EntryManager.getInstance().getPointWidth();
 
         // 5日均线
-        final float[] pts5 = new float[(pointCount+1) * 4];
+        final float[] pts5 = new float[(pointCount + 1) * 4];
         // 10日均线
-        final float[] pts10 = new float[(pointCount+1) * 4];
+        final float[] pts10 = new float[(pointCount + 1) * 4];
         // 20日均线
-        final float[] pts20 = new float[(pointCount+1) * 4];
-
-        final int offsetLeft = EntryManager.getInstance().getXoffsetLeft();
-        final int offsetRight = EntryManager.getInstance().getXoffsetRight();
+        final float[] pts20 = new float[(pointCount + 1) * 4];
 
         for (int i = pointBegin; i <= pointEnd; i++) {
 
             final Entry entry = entryList.get(i);
 
-            final int tempx = entry.getxLabelReal();
-            final float x = tempx + pointWidth / 2 + offsetLeft + offsetRight;
+            final float tempx = entry.getxLabelReal();
+            final float x = tempx + pointWidth / 2 + xoffsetLeft + xoffsetRight;
             final float y1 = entry.getMa5Real();
             final float y2 = entry.getMa10Real();
             final float y3 = entry.getMa20Real();
