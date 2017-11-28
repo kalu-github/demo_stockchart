@@ -12,6 +12,7 @@ import com.lib.stockchart.entry.EntryManager;
 import com.lib.stockchart.paint.StockPaint;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * description: 成交量
@@ -80,7 +81,7 @@ public class DrawTurnover implements IDraw {
     }
 
     @Override
-    public void onDrawData(BaseRender render, Canvas canvas, int pointSum, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh) {
+    public void onDrawData(BaseRender render, Canvas canvas, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh) {
 
         canvas.save();
 
@@ -121,10 +122,10 @@ public class DrawTurnover implements IDraw {
         // 2.设置画笔颜色
         StockPaint.setPaintWidth(5);
         // 2.循环遍历
-        for (int i = pointBegin; i < Math.min(pointEnd, pointBegin + pointCount); i++) {
+        for (int i = pointBegin; i <= pointEnd; i++) {
 
             // 当前点的数据
-            Entry entry = entryManager.getEntryList().get(i - 1);
+            Entry entry = entryManager.getEntryList().get(i);
 
             // 设置 涨、跌的颜色
             // 今日收盘价大于今日开盘价为涨
@@ -188,7 +189,7 @@ public class DrawTurnover implements IDraw {
 
         if (xHighligh == -1f || yHighligh == -1f) return;
 
-        final ArrayList<Entry> entryList = EntryManager.getInstance().getEntryList();
+        final List<Entry> entryList = EntryManager.getInstance().getEntryList();
         final int pointWidth = EntryManager.getInstance().getPointWidth();
 
         final Entry entryBegin = entryList.get(pointBegin);
@@ -240,7 +241,7 @@ public class DrawTurnover implements IDraw {
      */
     private void drawMadline(Canvas canvas, int pointCount, int pointBegin, int pointEnd) {
 
-        final ArrayList<Entry> entryList = EntryManager.getInstance().getEntryList();
+        final List<Entry> entryList = EntryManager.getInstance().getEntryList();
         final int pointWidth = EntryManager.getInstance().getPointWidth();
         final int boardPadding = EntryManager.getInstance().getBoardPadding();
 
@@ -248,13 +249,14 @@ public class DrawTurnover implements IDraw {
         final int offsetRight = EntryManager.getInstance().getXoffsetRight();
 
         // 5日均线
-        final float[] pts5 = new float[pointCount * 4];
+        final float[] pts5 = new float[(pointCount+1) * 4];
         // 10日均线
-        final float[] pts10 = new float[pointCount * 4];
+        final float[] pts10 = new float[(pointCount+1) * 4];
 
-        for (int i = pointBegin; i < Math.min(pointEnd, pointBegin + pointCount); i++) {
+        for (int i = pointBegin; i <= pointEnd; i++) {
 
-            final Entry entry = entryList.get(i - 1);
+            final Entry entry = entryList.get(i);
+
             final int tempx = entry.getxLabelReal();
             final float x = tempx + pointWidth / 2 + offsetLeft + offsetRight;
             final float y1 = mRectF.top + entry.getVolumeMa5Real() + boardPadding;

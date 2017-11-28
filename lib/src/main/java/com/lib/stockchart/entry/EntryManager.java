@@ -21,16 +21,6 @@ public class EntryManager {
     private int weightTop = 5;
     // 下部权重
     private int weightDown = 2;
-    // 默认显示多少个点
-    private int pointCount = 50;
-    // 最多显示多少个点
-    private int pointMax = 100;
-    // 最少显示多少个点
-    private int pointMin = 25;
-    // 当前显示区域, 起始点下标
-    private int pointBegin = -1;
-    // 当前显示区域, 结尾点下标
-    private int pointEnd = -1;
     // 每个点之间的空隙
     private int pointSpace = 10;
     // 每个点的宽度
@@ -144,46 +134,6 @@ public class EntryManager {
         return x1 != x2;
     }
 
-    public int getPointBegin() {
-        return pointBegin;
-    }
-
-    public void setPointBegin(int pointBegin) {
-        this.pointBegin = pointBegin;
-    }
-
-    public int getPointEnd() {
-        return pointEnd;
-    }
-
-    public void setPointEnd(int pointEnd) {
-        this.pointEnd = pointEnd;
-    }
-
-    public int getPointCount() {
-        return pointCount;
-    }
-
-    public void setPointCount(int pointCount) {
-        this.pointCount = pointCount;
-    }
-
-    public int getPointMax() {
-        return pointMax;
-    }
-
-    public void setPointMax(int pointMax) {
-        this.pointMax = pointMax;
-    }
-
-    public int getPointMin() {
-        return pointMin;
-    }
-
-    public void setPointMin(int pointMin) {
-        this.pointMin = pointMin;
-    }
-
     public int getWeightTop() {
         return weightTop;
     }
@@ -212,10 +162,15 @@ public class EntryManager {
     }
 
     // 数据集合
-    private final ArrayList<Entry> entries = new ArrayList<>();
+    private List<Entry> entries;
 
-    public ArrayList<Entry> getEntryList() {
+    public List<Entry> getEntryList() {
         return entries;
+    }
+
+    public int getIndexMax() {
+        if (null == entries) return 0;
+        else return entries.size() - 1;
     }
 
     public String getHintLoadStr() {
@@ -234,22 +189,17 @@ public class EntryManager {
         pointHighlightY[0] = -1;
         pointHighlightY[1] = -1;
         pointHighlight = -1;
-        pointBegin = -1;
-        pointEnd = -1;
-        entries.clear();
+        entries = null;
     }
 
     // 添加数据
-    public void addData(List<Entry> mDataList) {
+    public void addData(List<Entry> entries) {
 
-        if (null == mDataList) return;
+        if (null != this.entries) {
+            this.entries.clear();
+        }
 
-        final int size = mDataList.size();
-        pointEnd = size;
-        pointBegin = size - pointCount;
-
-        entries.clear();
-        entries.addAll(mDataList);
+        this.entries = entries;
 
         // 计算 MA MACD BOLL RSI KDJ 指标
         computeMA();

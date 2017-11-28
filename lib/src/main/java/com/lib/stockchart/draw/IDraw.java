@@ -23,5 +23,5 @@ public interface IDraw {
     /**
      * 绘制图形
      */
-    void onDrawData(BaseRender render, Canvas canvas, int pointSum, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh);
+    void onDrawData(BaseRender render, Canvas canvas, int indexCount, int indexBegin, int indexEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh);
 }

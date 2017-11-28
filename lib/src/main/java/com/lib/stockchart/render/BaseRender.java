@@ -43,7 +43,7 @@ public abstract class BaseRender {
     }
 
     // 股票指标列表
-    final List<IDraw> mDrawList = new ArrayList<>();
+    private final List<IDraw> mDrawList = new ArrayList<>();
     // 显示区域
     int left, top, right, bottom, width, height;
 
@@ -63,12 +63,8 @@ public abstract class BaseRender {
 
     /**
      * 计算数据
-     *
-     * @param pointBegin
-     * @param pointEnd
-     * @param pointCount
      */
-    void calculateData(int pointBegin, int pointEnd, int pointCount) {
+    void calculateData(int indexBegin, int indexEnd, int indexCount) {
 
         final int weightTop = EntryManager.getInstance().getWeightTop();
         final int weightDown = EntryManager.getInstance().getWeightDown();
@@ -80,9 +76,9 @@ public abstract class BaseRender {
         final float bottomSrc = height / weightSum * weightTop - boardPadding - xlabelHeight;
         final float heightSrc = bottomSrc - top - boardPadding;
 
-        final float priceMin = EntryManager.getInstance().calculatePriceMin(pointBegin - 1, Math.min(pointEnd, pointBegin + pointCount));
-        final float priceMax = EntryManager.getInstance().calculatePriceMax(pointBegin - 1, Math.min(pointEnd, pointBegin + pointCount));
-        final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(pointBegin - 1, Math.min(pointEnd, pointBegin + pointCount));
+        final float priceMin = EntryManager.getInstance().calculatePriceMin(indexBegin, indexEnd);
+        final float priceMax = EntryManager.getInstance().calculatePriceMax(indexBegin, indexEnd);
+        final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexEnd);
         float priceSum = priceMax - priceMin;
 
         // Log.e("BaseRender", "caculateZoom ==> pointCount = " + pointCount);
@@ -90,28 +86,28 @@ public abstract class BaseRender {
         // 点与点间隙
         final int pointSpace = EntryManager.getInstance().getPointSpace();
         // 每个点宽度
-        final int pointWidth = (width - 2 * boardPadding - (pointCount - 1) * pointSpace) / pointCount;
+        final int pointWidth = (width - 2 * boardPadding - (indexCount - 1) * pointSpace) / indexCount;
         EntryManager.getInstance().setPointWidth(pointWidth);
 
-        final ArrayList<Entry> entryList = EntryManager.getInstance().getEntryList();
+        final List<Entry> entryList = EntryManager.getInstance().getEntryList();
 
 //        final int offsetLeft = EntryManager.getInstance().getOffsetLeft();
 //        final int offsetRight = EntryManager.getInstance().getOffsetRight();
         final int realBegin = left + boardPadding;
 
-        for (int i = pointBegin; i < pointEnd; i++) {
+        for (int i = indexBegin; i <= indexEnd; i++) {
 
-            final Entry entry = entryList.get(i - 1);
+            final Entry entry = entryList.get(i);
 
-            if (i == pointBegin) {
+            if (i == indexBegin) {
                 // Log.e("KlineRender", "1temp = " + realBegin + ", pointWidth = " + pointWidth + ", pointSpace = " + pointSpace);
                 entry.setxLabelReal(realBegin);
-            } else if (i == pointEnd - 1) {
+            } else if (i == indexEnd) {
                 final int realEnd = right - boardPadding - pointWidth;
                 //  Log.e("KlineRender", "3temp = " + realEnd + ", pointWidth = " + pointWidth + ", pointSpace = " + pointSpace);
                 entry.setxLabelReal(realEnd);
             } else {
-                int temp = realBegin + (i - pointBegin) * (pointWidth + pointSpace) + StockPaint.PAINT_WIDTH_TURNOVER;
+                int temp = realBegin + (i - indexBegin) * (pointWidth + pointSpace);
                 //   Log.e("KlineRender", "2temp = " + temp + ", pointWidth = " + pointWidth + ", pointSpace = " + pointSpace);
                 entry.setxLabelReal(temp);
             }
@@ -132,9 +128,13 @@ public abstract class BaseRender {
         }
     }
 
+    public List<IDraw> getDrawList() {
+        return mDrawList;
+    }
+
     /**********************************************************************************************/
 
-    public abstract void onCanvas(Canvas canvas, boolean hightLight, int model);
+    public abstract void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexCountMax);
 
     public void clearData() {
         mDrawList.clear();

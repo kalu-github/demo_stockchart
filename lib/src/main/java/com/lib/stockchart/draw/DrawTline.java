@@ -12,6 +12,7 @@ import com.lib.stockchart.render.BaseRender;
 import com.lib.stockchart.render.RenderManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * description: 分时图
@@ -60,7 +61,7 @@ public class DrawTline implements IDraw {
     }
 
     @Override
-    public void onDrawData(BaseRender render, Canvas canvas, int pointSum, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh) {
+    public void onDrawData(BaseRender render, Canvas canvas, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh) {
         //  Log.e("DrawKline", "onDrawData ==> pointSum = " + pointSum + ", pointBegin = " + pointBegin + ", pointEnd = " + pointEnd + ", minPrice = " + minPrice + ", maxPrice = " + maxPrice + ", maxTurnover = " + maxTurnover);
 
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER)
@@ -144,7 +145,7 @@ public class DrawTline implements IDraw {
             canvas.drawText(hintLoadStr, width / 2, heightF / 2, StockPaint.getTextPaint(Paint.Align.CENTER, 30));
         } else {
 
-            ArrayList<Entry> entryList = EntryManager.getInstance().getEntryList();
+            List<Entry> entryList = EntryManager.getInstance().getEntryList();
 
             final Paint.FontMetrics fontMetrics = StockPaint.getTextPaint(Paint.Align.LEFT, 20).getFontMetrics();
             final float fontHeight = fontMetrics.bottom - fontMetrics.top;
@@ -194,19 +195,20 @@ public class DrawTline implements IDraw {
      */
     private void drawMadline(Canvas canvas, int pointCount, int pointBegin, int pointEnd) {
 
-        final ArrayList<Entry> entryList = EntryManager.getInstance().getEntryList();
+        final List<Entry> entryList = EntryManager.getInstance().getEntryList();
         final int pointWidth = EntryManager.getInstance().getPointWidth();
 
         // 5日均线
-        final float[] pts5 = new float[pointCount * 4];
+        final float[] pts5 = new float[(pointCount+1) * 4];
         // 10日均线
-        final float[] pts10 = new float[pointCount * 4];
+        final float[] pts10 = new float[(pointCount+1) * 4];
         // 20日均线
-        final float[] pts20 = new float[pointCount * 4];
+        final float[] pts20 = new float[(pointCount+1) * 4];
 
-        for (int i = pointBegin; i < Math.min(pointEnd, pointBegin + pointCount); i++) {
+        for (int i = pointBegin; i <= pointEnd; i++) {
 
-            final Entry entry = entryList.get(i - 1);
+            final Entry entry = entryList.get(i);
+
             final int tempx = entry.getxLabelReal();
             final float x = tempx + pointWidth / 2;
             final float y1 = entry.getMa5Real();
