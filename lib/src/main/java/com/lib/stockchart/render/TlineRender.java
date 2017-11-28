@@ -17,14 +17,14 @@ import java.util.List;
 public class TlineRender extends BaseRender {
 
     @Override
-    public void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexMax, float xoffsetLeft, float xoffsetRight, String loadingStr) {
+    public void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexMax, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding) {
 
         final List<IDraw> drawList = getDrawList();
 
         if (indexMax <= 0) {
             // Log.e("TlineRender", "onCanvas ==> 空数据");
             for (IDraw drawing : drawList) {
-                drawing.onDrawNull(canvas, loadingStr);
+                drawing.onDrawNull(canvas, loadingStr, xlabelHeight, boardPadding);
             }
         } else {
             // Log.e("TlineRender", "onCanvas ==> 有数据");
@@ -32,11 +32,11 @@ public class TlineRender extends BaseRender {
             final float minPrice = EntryManager.getInstance().calculatePriceMin(0, indexMax);
             final float maxPrice = EntryManager.getInstance().calculatePriceMax(0, indexMax);
             final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(0, indexMax);
-            calculateData(0, indexMax, indexMax);
+            calculateData(0, indexMax, indexMax, xlabelHeight, boardPadding);
 
             for (int i = 0; i < drawList.size(); i++) {
                 final IDraw temp = drawList.get(i);
-                temp.onDrawData(this, canvas, indexMax, 0, indexMax, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight);
+                temp.onDrawData(this, canvas, indexMax, 0, indexMax, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
             }
         }
     }

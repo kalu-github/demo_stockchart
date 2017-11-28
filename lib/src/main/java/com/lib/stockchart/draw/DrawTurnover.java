@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.lib.stockchart.render.BaseRender;
@@ -20,13 +21,15 @@ import java.util.List;
  */
 public class DrawTurnover implements IDraw {
 
-    // 绘图区域
-    private final RectF mRectF = new RectF();
-    private final int SPACE = 10;
+    private float left;
+    private float top;
+    private float right;
+    private float bottom;
+    private float width;
+    private float height;
 
     @Override
-    public void onDrawInit(int left1, int top1, int right1, int bottom1, int width1, int height1) {
-        Log.e("DrawTurnover", "onInit");
+    public void onDrawInit(int left1, int top1, int right1, int bottom1, int width1, int height1, float xlabelHeight, float boardPadding) {
 
         // 测试, 高度
         final int weightTop = EntryManager.getInstance().getWeightTop();
@@ -35,53 +38,26 @@ public class DrawTurnover implements IDraw {
         float height = height1 / weightSum;
 
         // 内边距
-        float left = left1;
-        float top = top1 + height * weightTop;
-        float right = right1;
-        float bottom = bottom1;
-        mRectF.set(left, top, right, bottom);
+        this.left = left1 + boardPadding;
+        this.top = (int) (top1 + height * weightTop) + boardPadding + xlabelHeight;
+        this.right = right1 - boardPadding;
+        this.bottom = bottom1 - boardPadding;
+        this.width = right - left;
+        this.height = bottom - top;
         Log.e("temp", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom);
     }
 
     @Override
-    public void onDrawNull(Canvas canvas, String str) {
-        Log.e("DrawTurnover1", "onDrawNull");
+    public void onDrawNull(Canvas canvas, String str, float xlabelHeight, float boardPadding) {
         //canvas.save();
 
-        // 1.边框
-        float left1 = mRectF.left;
-        float top1 = mRectF.top;
-        float right1 = mRectF.right;
-        float bottom1 = mRectF.bottom;
-
-        canvas.clipRect(left1 - SPACE, top1 - SPACE, right1 + SPACE, bottom1 + SPACE);
-        canvas.drawRect(left1 - SPACE, top1 - SPACE, right1 + SPACE, bottom1 + SPACE, StockPaint.getBorderPaint(5));
-
-        // 4条横线 - 虚线
-        float y = (bottom1 - top1) / 2 + top1;
-        float startX = left1 - SPACE;
-        float stopX = right1 + SPACE;
-        canvas.drawLine(startX, y, stopX, y, StockPaint.getDashPaint());
-
-        // 4条竖线 - 虚线
-        float temp2 = mRectF.width() / 5;
-        for (int i = 1; i < 5; i++) {
-            float startY = top1 - SPACE;
-            float x = left1 + i * temp2;
-            float stopY = bottom1 + SPACE;
-            canvas.drawLine(x, startY, x, stopY, StockPaint.getDashPaint());
-        }
-
-        // 文字交易量
-        canvas.drawText(str, mRectF.centerX(), mRectF.centerY(), StockPaint.getTextPaint(Paint.Align.CENTER, 30));
-
+        drawBackground(canvas, str, boardPadding);
         // 保存
         //canvas.restore();
     }
 
     @Override
-    public void onDrawData(BaseRender render, Canvas canvas, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight) {
-
+    public void onDrawData(BaseRender render, Canvas canvas, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding) {
         canvas.save();
 
         // Log.e("DrawTurnover1", "onDrawData ==> minIndex = "+minIndex+", maxIndex = "+maxIndex+", minPrice = "+minPrice+", maxPrice = "+maxPrice+", maxTurnover = "+maxTurnover);
@@ -89,29 +65,7 @@ public class DrawTurnover implements IDraw {
         final EntryManager entryManager = EntryManager.getInstance();
         final int pointWidth = EntryManager.getInstance().getPointWidth();
 
-        // 1.边框
-        float left1 = mRectF.left;
-        float top1 = mRectF.top;
-        float right1 = mRectF.right;
-        float bottom1 = mRectF.bottom;
-
-        canvas.clipRect(left1 - SPACE, top1 - SPACE, right1 + SPACE, bottom1 + SPACE);
-        canvas.drawRect(left1 - SPACE, top1 - SPACE, right1 + SPACE, bottom1 + SPACE, StockPaint.getBorderPaint(5));
-
-        // 4条横线 - 虚线
-        float y = (bottom1 - top1) / 2 + top1;
-        float startX = left1 - SPACE;
-        float stopX = right1 + SPACE;
-        canvas.drawLine(startX, y, stopX, y, StockPaint.getDashPaint());
-
-        // 4条竖线 - 虚线
-        float temp2 = mRectF.width() / 5;
-        for (int i = 1; i < 5; i++) {
-            float startY = top1 - SPACE;
-            float x = left1 + i * temp2;
-            float stopY = bottom1 + SPACE;
-            canvas.drawLine(x, startY, x, stopY, StockPaint.getDashPaint());
-        }
+        drawBackground(canvas, null, boardPadding);
 
         // 2.成交量
         // 2.设置画笔颜色
@@ -154,12 +108,11 @@ public class DrawTurnover implements IDraw {
 
             float left = entry.getxLabelReal() + xoffsetLeft + xoffsetRight;
             float right = left + pointWidth;
-            float bottom = mRectF.bottom;
-            float top = bottom - entry.getVolume() * mRectF.height() / maxTurnover;
+            float top = bottom - entry.getVolume() * height / maxTurnover;
 
             boolean isMin = Math.abs(top - bottom) < 1.f;
             // 成交量非常小画一条直线
-            canvas.drawRect(left, isMin ? (bottom - SPACE) : top, right, bottom, StockPaint.getTurnoverPaint());
+            canvas.drawRect(left, isMin ? (bottom - boardPadding) : top, right, bottom, StockPaint.getTurnoverPaint());
         }
 
         // drawMadline(canvas, pointCount, pointBegin, pointEnd);
@@ -168,46 +121,72 @@ public class DrawTurnover implements IDraw {
         Paint textPaint = StockPaint.getTextPaint(Paint.Align.LEFT, 20);
         Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
         float temp = fontMetrics.bottom - fontMetrics.top;
-        canvas.drawText(maxTurnover + "手", mRectF.left, mRectF.top + temp, textPaint);
+        canvas.drawText(maxTurnover + "手", left, top + temp, textPaint);
 
         // 高亮坐标
-        drawHightlight(canvas, xHighligh, yHighligh, pointCount, pointBegin, pointEnd);
+        drawHightlight(canvas, xHighligh, yHighligh, pointCount, pointBegin, pointEnd, xlabelHeight, boardPadding);
 
         // 保存
         canvas.restore();
     }
 
     /**
+     * 背景
+     */
+    private void drawBackground(Canvas canvas, String str, float boardPadding) {
+        // 1.边框
+        canvas.drawRect(left - 2 * boardPadding, top - 2 * boardPadding, right + 2 * boardPadding, bottom + 2 * boardPadding, StockPaint.getBorderPaint(3));
+
+        // 4条横线 - 虚线
+        float y = (bottom - top) / 2 + top;
+        float startX = left - boardPadding;
+        float stopX = right + boardPadding;
+        canvas.drawLine(startX, y, stopX, y, StockPaint.getDashPaint());
+
+        // 4条竖线 - 虚线
+        float temp2 = width / 5;
+        for (int i = 1; i < 5; i++) {
+            float startY = top - boardPadding;
+            float x = left + i * temp2;
+            float stopY = bottom + boardPadding;
+            canvas.drawLine(x, startY, x, stopY, StockPaint.getDashPaint());
+        }
+
+        // 文字交易量
+        if (!TextUtils.isEmpty(str)) {
+            canvas.drawText(str, right - width / 2, bottom - height / 2, StockPaint.getTextPaint(Paint.Align.CENTER, 30));
+        }
+    }
+
+    /**
      * 高亮
      */
-    private void drawHightlight(Canvas canvas, float xHighligh, float yHighligh, int pointCount, int pointBegin, int pointEnd) {
+    private void drawHightlight(Canvas canvas, float xHighligh, float yHighligh, int pointCount, int pointBegin, int pointEnd, float xlabelHeight, float boardPadding) {
 
         if (xHighligh == -1f || yHighligh == -1f) return;
 
         final List<Entry> entryList = EntryManager.getInstance().getEntryList();
         final int pointWidth = EntryManager.getInstance().getPointWidth();
 
-        final Entry entryBegin = entryList.get(pointBegin);
+        final Entry entryBegin = entryList.get(pointBegin - 1);
         final float xBegin = entryBegin.getxLabelReal() + pointWidth / 2;
 
         final Entry entryEnd = entryList.get(pointEnd - 1);
         final float xEnd = entryEnd.getxLabelReal() + pointWidth / 2;
 
-        final float boardPadding = EntryManager.getInstance().getBoardPadding();
-
         if (xHighligh <= xBegin) {
             // 横线
-            final float y = entryList.get(pointBegin - 1).getVolumeReal();
-            canvas.drawLine(mRectF.left + boardPadding, y, mRectF.right - boardPadding, y, StockPaint.getLinePaint(Color.BLACK));
+            final float y = entryList.get(pointBegin - 1).getOpenReal();
+            canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
             // 竖线
-            final float x = EntryManager.getInstance().getBoardPadding() + mRectF.left + pointWidth / 2;
-            canvas.drawLine(x, mRectF.top + boardPadding, x, mRectF.bottom - boardPadding, StockPaint.getLinePaint(Color.BLACK));
+            final float x = boardPadding + left + pointWidth / 2;
+            canvas.drawLine(x, top, x, bottom, StockPaint.getLinePaint(Color.BLACK));
         } else if (xHighligh >= xEnd) {
             // 横线
-            final float y = entryList.get(pointEnd - 1).getVolumeReal();
-            canvas.drawLine(mRectF.left + boardPadding, y, mRectF.right - boardPadding, y, StockPaint.getLinePaint(Color.BLACK));
+            final float y = entryList.get(pointEnd - 1).getOpenReal();
+            canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
             // 竖线
-            canvas.drawLine(xEnd, mRectF.top + boardPadding, xEnd, mRectF.bottom - boardPadding, StockPaint.getLinePaint(Color.BLACK));
+            canvas.drawLine(xEnd, top, xEnd, bottom, StockPaint.getLinePaint(Color.BLACK));
         } else {
             for (int i = pointBegin; i < Math.min(pointEnd, pointBegin + pointCount); i++) {
 
@@ -221,10 +200,10 @@ public class DrawTurnover implements IDraw {
 
                 if (xHighligh > x1 && xHighligh < x2) {
                     // 横线
-                    final float y = entryList.get(i - 1).getVolumeReal();
-                    canvas.drawLine(mRectF.left + boardPadding, y, mRectF.right - boardPadding, y, StockPaint.getLinePaint(Color.BLACK));
+                    final float y = entryList.get(i - 1).getOpenReal();
+                    canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
                     // 竖线
-                    canvas.drawLine(x1, mRectF.top + boardPadding, x1, mRectF.bottom - boardPadding, StockPaint.getLinePaint(Color.BLACK));
+                    canvas.drawLine(x1, top, x1, bottom, StockPaint.getLinePaint(Color.BLACK));
                     break;
                 }
             }
@@ -234,11 +213,10 @@ public class DrawTurnover implements IDraw {
     /**
      * MAD
      */
-    private void drawMadline(Canvas canvas, int pointCount, int pointBegin, int pointEnd, float xoffsetLeft, float xoffsetRight) {
+    private void drawMadline(Canvas canvas, int pointCount, int pointBegin, int pointEnd, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding) {
 
         final List<Entry> entryList = EntryManager.getInstance().getEntryList();
         final float pointWidth = EntryManager.getInstance().getPointWidth();
-        final float boardPadding = EntryManager.getInstance().getBoardPadding();
 
         // 5日均线
         final float[] pts5 = new float[(pointCount + 1) * 4];
@@ -251,8 +229,8 @@ public class DrawTurnover implements IDraw {
 
             final float tempx = entry.getxLabelReal();
             final float x = tempx + pointWidth / 2 + xoffsetLeft + xoffsetRight;
-            final float y1 = mRectF.top + entry.getVolumeMa5Real() + boardPadding;
-            final float y2 = mRectF.top + entry.getVolumeMa10Real() + boardPadding;
+            final float y1 = top + entry.getVolumeMa5Real() + boardPadding;
+            final float y2 = top + entry.getVolumeMa10Real() + boardPadding;
             // Log.e("uuuu", "i = " + (i - 1) + ", x = " + x + ", y1 = " + y1 + ", y2 = " + y2);
 
             final int tempi = i - pointBegin;

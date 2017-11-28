@@ -45,6 +45,8 @@ public class StockChartView extends View {
     private float xoffsetRight = 0f;
     private float xoffsetMax = 100f;
     private String loadingStr;
+    private float xlabelHeight = 25f;
+    private float boardPadding = 5f;
 
     // 时间戳
 //    private long timestamp = System.currentTimeMillis();
@@ -98,6 +100,8 @@ public class StockChartView extends View {
             xoffsetMax = a.getDimension(R.styleable.StockChartView_scv_xoffset_max, 100f);
             final String tempStr = a.getString(R.styleable.StockChartView_scv_hint_load);
             loadingStr = TextUtils.isEmpty(tempStr) ? "正在加载信息" : tempStr;
+            boardPadding = a.getDimension(R.styleable.StockChartView_scv_board_padding, 5f);
+            xlabelHeight = a.getDimension(R.styleable.StockChartView_scv_xlabel_height, 25f);
 
             int weightTop = a.getInt(R.styleable.StockChartView_scv_weight_top, 5);
             EntryManager.getInstance().setWeightTop(weightTop);
@@ -105,10 +109,6 @@ public class StockChartView extends View {
             EntryManager.getInstance().setWeightDown(weightDown);
             float pointSpace = a.getDimension(R.styleable.StockChartView_scv_point_space, 10f);
             EntryManager.getInstance().setPointSpace(pointSpace);
-            final int boardPadding = a.getDimensionPixelSize(R.styleable.StockChartView_scv_board_padding, 5);
-            EntryManager.getInstance().setBoardPadding(boardPadding);
-            final int xlabelHeight = a.getDimensionPixelSize(R.styleable.StockChartView_scv_xlabel_height, 25);
-            EntryManager.getInstance().setXlabelHeight(xlabelHeight);
 
             canDragXoffset = a.getBoolean(R.styleable.StockChartView_scv_xoffset_enable, false);
 
@@ -189,10 +189,10 @@ public class StockChartView extends View {
 
         if (model == RenderManager.MODEL_TLINE_TURNOVER) {
             // Log.e("StockChartView", "onDraw TLLINE");
-            RenderManager.getInstance().getTlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, 0, 0, loadingStr);
+            RenderManager.getInstance().getTlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, 0, 0, loadingStr, xlabelHeight, boardPadding);
         } else if (model == RenderManager.MODEL_KLINE_TURNOVER) {
             //  Log.e("StockChartView", "onDraw KLLINE");
-            RenderManager.getInstance().getKlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, xoffsetLeft, xoffsetRight, loadingStr);
+            RenderManager.getInstance().getKlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, xoffsetLeft, xoffsetRight, loadingStr, xlabelHeight, boardPadding);
         }
     }
 
@@ -205,8 +205,8 @@ public class StockChartView extends View {
         int right = getRight() - getPaddingRight();
         int bottom = getBottom() - getPaddingBottom();
         //  Log.e("StockChartView", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom);
-        RenderManager.getInstance().getKlineRender().onSizeChanged(left, top, right, bottom);
-        RenderManager.getInstance().getTlineRender().onSizeChanged(left, top, right, bottom);
+        RenderManager.getInstance().getKlineRender().onSizeChanged(left, top, right, bottom, xlabelHeight, boardPadding);
+        RenderManager.getInstance().getTlineRender().onSizeChanged(left, top, right, bottom, xlabelHeight, boardPadding);
 
         // 横屏
 //        if (getContext().getApplicationContext().getResources().getConfiguration().orientation != Configuration.ORIENTATION_PORTRAIT) {

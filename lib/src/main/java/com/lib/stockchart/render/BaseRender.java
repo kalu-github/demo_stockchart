@@ -47,7 +47,7 @@ public abstract class BaseRender {
     // 显示区域
     int left, top, right, bottom, width, height;
 
-    public void onSizeChanged(int left, int top, int right, int bottom) {
+    public void onSizeChanged(int left, int top, int right, int bottom, float xlabelHeight, float boardPadding) {
         this.left = left;
         this.top = top;
         this.right = right;
@@ -57,22 +57,20 @@ public abstract class BaseRender {
         Log.e("BaseRender", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom + ", width = " + width + ", height = " + height);
 
         for (IDraw drawing : mDrawList) {
-            drawing.onDrawInit(this.left, this.top, this.right, this.bottom, this.width, this.height);
+            drawing.onDrawInit(this.left, this.top, this.right, this.bottom, this.width, this.height, xlabelHeight, boardPadding);
         }
     }
 
     /**
      * 计算数据
      */
-    void calculateData(int indexBegin, int indexEnd, int indexCount) {
+    void calculateData(int indexBegin, int indexEnd, int indexCount, float xlabelHeight, float boardPadding) {
 
         final int weightTop = EntryManager.getInstance().getWeightTop();
         final int weightDown = EntryManager.getInstance().getWeightDown();
         final int weightSum = weightTop + weightDown;
 
         // 内边框边距
-        final float boardPadding = EntryManager.getInstance().getBoardPadding();
-        final float xlabelHeight = EntryManager.getInstance().getXlabelHeight();
         final float bottomSrc = height / weightSum * weightTop - boardPadding - xlabelHeight;
         final float heightSrc = bottomSrc - top - boardPadding;
 
@@ -98,7 +96,6 @@ public abstract class BaseRender {
                 entry.setxLabelReal(realEnd);
             } else {
                 float temp = realBegin + (i - indexBegin) * (pointWidth + pointSpace);
-                //   Log.e("KlineRender", "2temp = " + temp + ", pointWidth = " + pointWidth + ", pointSpace = " + pointSpace);
                 entry.setxLabelReal(temp);
             }
 
@@ -128,7 +125,7 @@ public abstract class BaseRender {
 
     /**********************************************************************************************/
 
-    public abstract void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexCountMax, float xoffsetLeft, float xoffsetRight, String loadingStr);
+    public abstract void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexCountMax, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding);
 
     public void clearData() {
         mDrawList.clear();

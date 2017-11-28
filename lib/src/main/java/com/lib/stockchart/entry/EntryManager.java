@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class EntryManager {
 
-    // 图标边框和信息的内边距
-    private float boardPadding = 10f;
+//    // 图标边框和信息的内边距
+//    private float boardPadding = 10f;
     // 上部权重
     private int weightTop = 5;
     // 下部权重
@@ -23,16 +23,6 @@ public class EntryManager {
     private float pointSpace = 10f;
     // 每个点的宽度
     private int pointWidth = 10;
-    // x轴显示文本区域高度
-    private float xlabelHeight = 50f;
-
-    public float getXlabelHeight() {
-        return xlabelHeight;
-    }
-
-    public void setXlabelHeight(int xlabelHeight) {
-        this.xlabelHeight = xlabelHeight;
-    }
 
     public void setPointWidth(int pointWidth) {
         this.pointWidth = pointWidth;
@@ -56,13 +46,13 @@ public class EntryManager {
         this.pointSpace = pointSpace;
     }
 
-    public float getBoardPadding() {
-        return boardPadding;
-    }
-
-    public void setBoardPadding(float boardPadding) {
-        this.boardPadding = boardPadding;
-    }
+//    public float getBoardPadding() {
+//        return boardPadding;
+//    }
+//
+//    public void setBoardPadding(float boardPadding) {
+//        this.boardPadding = boardPadding;
+//    }
 
     public int getPointHighlight() {
         return pointHighlight;
