@@ -29,7 +29,7 @@ public class DrawKline implements IDraw {
     private float heightF;
 
     @Override
-    public void onDrawInit(int left1, int top1, int right1, int bottom1, int width1, int height1, float xlabelHeight, float boardPadding) {
+    public void onDrawInit(int left1, int top1, int right1, int bottom1, int width1, int height1, float boardPadding) {
 
         // 测试, 高度
         final int weightTop = EntryManager.getInstance().getWeightTop();

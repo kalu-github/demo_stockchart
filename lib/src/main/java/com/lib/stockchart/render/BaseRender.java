@@ -47,7 +47,7 @@ public abstract class BaseRender {
     // 显示区域
     int left, top, right, bottom, width, height;
 
-    public void onSizeChanged(int left, int top, int right, int bottom, float xlabelHeight, float boardPadding) {
+    public void onSizeChanged(int left, int top, int right, int bottom, float boardPadding) {
         this.left = left;
         this.top = top;
         this.right = right;
@@ -57,7 +57,7 @@ public abstract class BaseRender {
         Log.e("BaseRender", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom + ", width = " + width + ", height = " + height);
 
         for (IDraw drawing : mDrawList) {
-            drawing.onDrawInit(this.left, this.top, this.right, this.bottom, this.width, this.height, xlabelHeight, boardPadding);
+            drawing.onDrawInit(this.left, this.top, this.right, this.bottom, this.width, this.height, boardPadding);
         }
     }
 

@@ -29,7 +29,7 @@ public class DrawTurnover implements IDraw {
     private float height;
 
     @Override
-    public void onDrawInit(int left1, int top1, int right1, int bottom1, int width1, int height1, float xlabelHeight, float boardPadding) {
+    public void onDrawInit(int left1, int top1, int right1, int bottom1, int width1, int height1, float boardPadding) {
 
         // 测试, 高度
         final int weightTop = EntryManager.getInstance().getWeightTop();
@@ -39,7 +39,7 @@ public class DrawTurnover implements IDraw {
 
         // 内边距
         this.left = left1 + boardPadding;
-        this.top = (int) (top1 + height * weightTop) + boardPadding + xlabelHeight;
+        this.top = (int) (top1 + height * weightTop) + boardPadding;
         this.right = right1 - boardPadding;
         this.bottom = bottom1 - boardPadding;
         this.width = right - left;
