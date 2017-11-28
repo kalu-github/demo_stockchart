@@ -18,14 +18,14 @@ import java.util.List;
 public class KlineRender extends BaseRender {
 
     @Override
-    public void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexMax, float xoffsetLeft, float xoffsetRight) {
+    public void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexMax, float xoffsetLeft, float xoffsetRight, String loadingStr) {
         Log.e("KlineRender", "onCanvas");
 
         final List<IDraw> drawList = getDrawList();
 
         if (indexMax <= 0) {
             for (IDraw drawing : drawList) {
-                drawing.onDrawNull(canvas);
+                drawing.onDrawNull(canvas, loadingStr);
             }
         } else {
 

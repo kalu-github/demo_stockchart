@@ -12,16 +12,39 @@ public interface IDraw {
 
     /**
      * 画布位置信息
+     *
+     * @param left   左
+     * @param top    上
+     * @param right  右
+     * @param bottom 下
+     * @param width  宽
+     * @param height 高
      */
     void onDrawInit(int left, int top, int right, int bottom, int width, int height);
 
     /**
      * 网络加载数据, 等待过程的显示信息
+     *
+     * @param canvas 画布
+     * @param str    提示信息
      */
-    void onDrawNull(Canvas canvas);
+    void onDrawNull(Canvas canvas, String str);
 
     /**
      * 绘制图形
+     *
+     * @param render       着色管理
+     * @param canvas       画布
+     * @param indexCount   要显示的个数
+     * @param indexBegin   x轴起始索引
+     * @param indexEnd     x轴结束索引
+     * @param minPrice     y轴最低价
+     * @param maxPrice     y轴最高价
+     * @param maxTurnover  成交量
+     * @param xHighligh    x高亮坐标
+     * @param yHighligh    y高亮坐标
+     * @param xoffsetLeft  刷新, 左侧位移
+     * @param xoffsetRight 刷新, 右侧位移
      */
     void onDrawData(BaseRender render, Canvas canvas, int indexCount, int indexBegin, int indexEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight);
 }

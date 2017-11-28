@@ -3,6 +3,7 @@ package com.lib.stockchart.draw;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.lib.stockchart.entry.Entry;
@@ -47,14 +48,14 @@ public class DrawKline implements IDraw {
     }
 
     @Override
-    public void onDrawNull(Canvas canvas) {
+    public void onDrawNull(Canvas canvas, String str) {
 
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
             return;
 
         canvas.save();
         // canvas.clipRect(left, top, right, bottom);
-        drawBackground(canvas, -1, -1, -1, true);
+        drawBackground(canvas, -1, -1, -1, str);
         canvas.restore();
     }
 
@@ -69,7 +70,7 @@ public class DrawKline implements IDraw {
         // canvas.clipRect(left, top, right, bottom);
 
         // 1.边框
-        drawBackground(canvas, pointCount, pointBegin, pointEnd, false);
+        drawBackground(canvas, pointCount, pointBegin, pointEnd, null);
         // 2.K线
         drawKline(canvas, pointBegin, pointEnd, xoffsetLeft, xoffsetRight);
         // 3.mad
@@ -141,7 +142,7 @@ public class DrawKline implements IDraw {
     /**
      * 背景
      */
-    private void drawBackground(Canvas canvas, int entryCount, int entryBegin, int entryEnd, boolean nullData) {
+    private void drawBackground(Canvas canvas, int entryCount, int entryBegin, int entryEnd, String str) {
 
         // X轴显示区域高度
         final float xlabelHeight = EntryManager.getInstance().getXlabelHeight();
@@ -167,10 +168,9 @@ public class DrawKline implements IDraw {
             canvas.drawLine(x, startY, x, stopY, StockPaint.getDashPaint());
         }
 
-        if (nullData) {
+        if (!TextUtils.isEmpty(str)) {
             // 文字交易量
-            final String hintLoadStr = EntryManager.getInstance().getHintLoadStr();
-            canvas.drawText(hintLoadStr, width / 2, heightF / 2, StockPaint.getTextPaint(Paint.Align.CENTER, 30));
+            canvas.drawText(str, width / 2, heightF / 2, StockPaint.getTextPaint(Paint.Align.CENTER, 30));
         } else {
 
             List<Entry> entryList = EntryManager.getInstance().getEntryList();

@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.os.Vibrator;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.widget.ScrollerCompat;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -43,6 +44,7 @@ public class StockChartView extends View {
     private float xoffsetLeft = 0f;
     private float xoffsetRight = 0f;
     private float xoffsetMax = 100f;
+    private String loadingStr;
 
     // 时间戳
 //    private long timestamp = System.currentTimeMillis();
@@ -94,13 +96,13 @@ public class StockChartView extends View {
             pointCountMax = a.getInt(R.styleable.StockChartView_scv_point_max, 75);
             pointCountMin = a.getInt(R.styleable.StockChartView_scv_point_min, 25);
             xoffsetMax = a.getDimension(R.styleable.StockChartView_scv_xoffset_max, 100f);
+            final String tempStr = a.getString(R.styleable.StockChartView_scv_hint_load);
+            loadingStr = TextUtils.isEmpty(tempStr) ? "正在加载信息" : tempStr;
 
             int weightTop = a.getInt(R.styleable.StockChartView_scv_weight_top, 5);
             EntryManager.getInstance().setWeightTop(weightTop);
             int weightDown = a.getInt(R.styleable.StockChartView_scv_weight_down, 2);
             EntryManager.getInstance().setWeightDown(weightDown);
-            String hintLoad = a.getString(R.styleable.StockChartView_scv_hint_load);
-            EntryManager.getInstance().setHintLoadStr(hintLoad);
             float pointSpace = a.getDimension(R.styleable.StockChartView_scv_point_space, 10f);
             EntryManager.getInstance().setPointSpace(pointSpace);
             final int boardPadding = a.getDimensionPixelSize(R.styleable.StockChartView_scv_board_padding, 5);
@@ -187,10 +189,10 @@ public class StockChartView extends View {
 
         if (model == RenderManager.MODEL_TLINE_TURNOVER) {
             // Log.e("StockChartView", "onDraw TLLINE");
-            RenderManager.getInstance().getTlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, 0, 0);
+            RenderManager.getInstance().getTlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, 0, 0, loadingStr);
         } else if (model == RenderManager.MODEL_KLINE_TURNOVER) {
             //  Log.e("StockChartView", "onDraw KLLINE");
-            RenderManager.getInstance().getKlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, xoffsetLeft, xoffsetRight);
+            RenderManager.getInstance().getKlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, xoffsetLeft, xoffsetRight, loadingStr);
         }
     }
 

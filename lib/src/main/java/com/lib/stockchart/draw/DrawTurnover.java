@@ -44,7 +44,7 @@ public class DrawTurnover implements IDraw {
     }
 
     @Override
-    public void onDrawNull(Canvas canvas) {
+    public void onDrawNull(Canvas canvas, String str) {
         Log.e("DrawTurnover1", "onDrawNull");
         //canvas.save();
 
@@ -73,8 +73,7 @@ public class DrawTurnover implements IDraw {
         }
 
         // 文字交易量
-        final String hintLoadStr = EntryManager.getInstance().getHintLoadStr();
-        canvas.drawText(hintLoadStr, mRectF.centerX(), mRectF.centerY(), StockPaint.getTextPaint(Paint.Align.CENTER, 30));
+        canvas.drawText(str, mRectF.centerX(), mRectF.centerY(), StockPaint.getTextPaint(Paint.Align.CENTER, 30));
 
         // 保存
         //canvas.restore();
@@ -242,9 +241,9 @@ public class DrawTurnover implements IDraw {
         final float boardPadding = EntryManager.getInstance().getBoardPadding();
 
         // 5日均线
-        final float[] pts5 = new float[(pointCount+1) * 4];
+        final float[] pts5 = new float[(pointCount + 1) * 4];
         // 10日均线
-        final float[] pts10 = new float[(pointCount+1) * 4];
+        final float[] pts10 = new float[(pointCount + 1) * 4];
 
         for (int i = pointBegin; i <= pointEnd; i++) {
 

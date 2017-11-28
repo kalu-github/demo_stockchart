@@ -15,8 +15,6 @@ public class EntryManager {
 
     // 图标边框和信息的内边距
     private float boardPadding = 10f;
-    // 加载提示信息
-    private String hintLoadStr = "正在加载数据中...";
     // 上部权重
     private int weightTop = 5;
     // 下部权重
@@ -146,15 +144,6 @@ public class EntryManager {
         else return entries.size() - 1;
     }
 
-    public String getHintLoadStr() {
-        return hintLoadStr;
-    }
-
-    public void setHintLoadStr(String hintLoadStr) {
-        if (TextUtils.isEmpty(hintLoadStr)) return;
-        this.hintLoadStr = hintLoadStr;
-    }
-
     // 重置数据
     public void resetData() {
         pointHighlightX[0] = -1;
@@ -186,7 +175,7 @@ public class EntryManager {
 
         float temp = 0;
 
-        for (int i = start; i < end; i++) {
+        for (int i = start; i <= end; i++) {
             Entry entry = entries.get(i);
             final float ma5 = entry.getMa5();
             final float ma10 = entry.getMa10();
@@ -208,7 +197,7 @@ public class EntryManager {
 
         float temp = 0;
 
-        for (int i = start; i < end; i++) {
+        for (int i = start; i <= end; i++) {
             Entry entry = entries.get(i);
             final float ma5 = entry.getMa5();
             final float ma10 = entry.getMa10();
@@ -230,7 +219,7 @@ public class EntryManager {
 
         float temp = 0;
 
-        for (int i = start; i < end; i++) {
+        for (int i = start; i <= end; i++) {
             Entry entry = entries.get(i);
             float high = entry.getVolume();
             if (i == start) {

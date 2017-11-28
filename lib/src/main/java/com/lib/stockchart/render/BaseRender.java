@@ -128,7 +128,7 @@ public abstract class BaseRender {
 
     /**********************************************************************************************/
 
-    public abstract void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexCountMax, float xoffsetLeft, float xoffsetRight);
+    public abstract void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexCountMax, float xoffsetLeft, float xoffsetRight, String loadingStr);
 
     public void clearData() {
         mDrawList.clear();

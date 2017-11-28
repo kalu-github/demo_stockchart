@@ -3,6 +3,7 @@ package com.lib.stockchart.draw;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.lib.stockchart.entry.Entry;
@@ -47,7 +48,7 @@ public class DrawTline implements IDraw {
     }
 
     @Override
-    public void onDrawNull(Canvas canvas) {
+    public void onDrawNull(Canvas canvas, String str) {
 
         Log.e("DrawTline", "onDrawNull ==> 1");
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER)
@@ -56,7 +57,7 @@ public class DrawTline implements IDraw {
 
         canvas.save();
         // canvas.clipRect(left, top, right, bottom);
-        drawBackground(canvas, -1, -1, -1, true);
+        drawBackground(canvas, -1, -1, -1, str);
         canvas.restore();
     }
 
@@ -71,7 +72,7 @@ public class DrawTline implements IDraw {
         // canvas.clipRect(left, top, right, bottom);
 
         // 1.边框
-        drawBackground(canvas, pointCount, pointBegin, pointEnd, false);
+        drawBackground(canvas, pointCount, pointBegin, pointEnd, null);
         // 3.mad
         drawMadline(canvas, pointCount, pointBegin, pointEnd);
         // 4.价格
@@ -107,13 +108,8 @@ public class DrawTline implements IDraw {
 
     /**
      * 背景
-     *
-     * @param canvas
-     * @param nullData
-     * @param entryBegin
-     * @param entryEnd
      */
-    private void drawBackground(Canvas canvas, int entryCount, int entryBegin, int entryEnd, boolean nullData) {
+    private void drawBackground(Canvas canvas, int entryCount, int entryBegin, int entryEnd, String str) {
 
         // X轴显示区域高度
         final float xlabelHeight = EntryManager.getInstance().getXlabelHeight();
@@ -139,10 +135,8 @@ public class DrawTline implements IDraw {
             canvas.drawLine(x, startY, x, stopY, StockPaint.getDashPaint());
         }
 
-        if (nullData) {
-            // 文字交易量
-            final String hintLoadStr = EntryManager.getInstance().getHintLoadStr();
-            canvas.drawText(hintLoadStr, width / 2, heightF / 2, StockPaint.getTextPaint(Paint.Align.CENTER, 30));
+        if (!TextUtils.isEmpty(str)) {
+            canvas.drawText(str, width / 2, heightF / 2, StockPaint.getTextPaint(Paint.Align.CENTER, 30));
         } else {
 
             List<Entry> entryList = EntryManager.getInstance().getEntryList();
@@ -199,11 +193,11 @@ public class DrawTline implements IDraw {
         final int pointWidth = EntryManager.getInstance().getPointWidth();
 
         // 5日均线
-        final float[] pts5 = new float[(pointCount+1) * 4];
+        final float[] pts5 = new float[(pointCount + 1) * 4];
         // 10日均线
-        final float[] pts10 = new float[(pointCount+1) * 4];
+        final float[] pts10 = new float[(pointCount + 1) * 4];
         // 20日均线
-        final float[] pts20 = new float[(pointCount+1) * 4];
+        final float[] pts20 = new float[(pointCount + 1) * 4];
 
         for (int i = pointBegin; i <= pointEnd; i++) {
 

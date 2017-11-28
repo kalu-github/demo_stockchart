@@ -17,17 +17,17 @@ import java.util.List;
 public class TlineRender extends BaseRender {
 
     @Override
-    public void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexMax, float xoffsetLeft, float xoffsetRight) {
+    public void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexMax, float xoffsetLeft, float xoffsetRight, String loadingStr) {
 
         final List<IDraw> drawList = getDrawList();
 
         if (indexMax <= 0) {
             // Log.e("TlineRender", "onCanvas ==> 空数据");
             for (IDraw drawing : drawList) {
-                drawing.onDrawNull(canvas);
+                drawing.onDrawNull(canvas, loadingStr);
             }
         } else {
-           // Log.e("TlineRender", "onCanvas ==> 有数据");
+            // Log.e("TlineRender", "onCanvas ==> 有数据");
 
             final float minPrice = EntryManager.getInstance().calculatePriceMin(0, indexMax);
             final float maxPrice = EntryManager.getInstance().calculatePriceMax(0, indexMax);
