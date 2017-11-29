@@ -82,7 +82,6 @@ StockChartView.setOnStockChartChangeListener(new OnStockChartChangeListener() {
 
                         }
 });
-
 ```
 ```
 todo list：
