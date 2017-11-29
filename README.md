@@ -1,5 +1,7 @@
 ![image](https://github.com/153437803/StockChart/blob/master/Screenrecorder-2017-11-29.gif )  
 
+![image](https://github.com/153437803/StockChart/blob/master/20171130002727.png )
+
 ```
 <declare-styleable name="StockChartView">
     <!-- 权重 - 上面 -->
@@ -87,7 +89,7 @@ StockChartView.setOnStockChartChangeListener(new OnStockChartChangeListener() {
 todo list：
 
 1.横竖屏切换，无画面（已解决）
-  setLayerType(View.LAYER_TYPE_SOFTWARE, null); 横屏切换ondraw()不执行
+  虚线设置setLayerType(View.LAYER_TYPE_SOFTWARE, null); 横屏切换ondraw()不执行
 2.高亮（已解决）
 3.滑动（已解决）
 
