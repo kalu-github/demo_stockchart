@@ -19,7 +19,7 @@ public class KlineRender extends BaseRender {
 
     @Override
     public void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexMax, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding) {
-        Log.e("KlineRender", "onCanvas");
+       // Log.e("KlineRender", "onCanvas");
 
         final List<IDraw> drawList = getDrawList();
 
@@ -30,7 +30,7 @@ public class KlineRender extends BaseRender {
         } else {
 
             calculateData(indexBegin, indexEnd, indexCount, xlabelHeight, boardPadding);
-            Log.e("KlineRender", "onCanvas ==> indexBegin = " + indexBegin + ", indexEnd = " + indexEnd+", indexCount = "+indexCount);
+           // Log.e("KlineRender", "onCanvas ==> indexBegin = " + indexBegin + ", indexEnd = " + indexEnd+", indexCount = "+indexCount);
 
             final float minPrice = EntryManager.getInstance().calculatePriceMin(indexBegin, indexEnd);
             final float maxPrice = EntryManager.getInstance().calculatePriceMax(indexBegin, indexEnd);

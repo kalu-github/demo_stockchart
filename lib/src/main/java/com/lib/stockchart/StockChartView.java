@@ -85,9 +85,6 @@ public class StockChartView extends View {
 
     public StockChartView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        // 重置数据
-        EntryManager.getInstance().resetData();
 
         // 自定义属性
         final Resources.Theme theme = context.getTheme();
@@ -148,6 +145,8 @@ public class StockChartView extends View {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
 
+                getParent().requestDisallowInterceptTouchEvent(false);
+
                 // 取消高亮
                 if (isLongPress) {
                     if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
@@ -183,15 +182,13 @@ public class StockChartView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        // Log.e("StockChartView", "onDraw");
+        Log.e("StockChartView", "onDraw ==>");
 
         final int model = RenderManager.getInstance().getRenderModel();
 
         if (model == RenderManager.MODEL_TLINE_TURNOVER) {
-            // Log.e("StockChartView", "onDraw TLLINE");
             RenderManager.getInstance().getTlineRender().onCanvas(canvas, 0, indexMax, indexMax, indexMax, 0, 0, loadingStr, xlabelHeight, boardPadding);
         } else if (model == RenderManager.MODEL_KLINE_TURNOVER) {
-            //  Log.e("StockChartView", "onDraw KLLINE");
             RenderManager.getInstance().getKlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, xoffsetLeft, xoffsetRight, loadingStr, xlabelHeight, boardPadding);
         }
     }
@@ -199,6 +196,7 @@ public class StockChartView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        Log.e("StockChartView", "onSizeChanged ==>");
 
         int left = getLeft() + getPaddingLeft();
         int top = getTop() + getPaddingTop();
@@ -215,10 +213,10 @@ public class StockChartView extends View {
 //        }
 
         // IDE预览模式下, 添加测试数据
-//        if (isInEditMode()) {
-//            final ArrayList<Entry> entries = StockDataTest.parseKLineData(StockDataTest.KLINE);
-//            notifyDataSetChanged(entries);
-//        }
+        if (isInEditMode()) {
+            final ArrayList<Entry> entries = StockDataTest.parseKLineData(StockDataTest.KLINE);
+            notifyDataSetChanged(entries);
+        }
     }
 
 //    @Override
@@ -402,6 +400,7 @@ public class StockChartView extends View {
 
                         xoffsetRight = xoffsetRight - distanceX;
                         xoffsetLeft = 0;
+                        getParent().requestDisallowInterceptTouchEvent(true);
                         postInvalidate();
                     } else {
 
@@ -413,6 +412,7 @@ public class StockChartView extends View {
 
                         indexEnd = indexEndTemp;
                         indexBegin = indexBeginTemp;
+                        getParent().requestDisallowInterceptTouchEvent(true);
                         postInvalidate();
                     }
                 }
@@ -430,6 +430,7 @@ public class StockChartView extends View {
                         Log.e("rrrrr", "左侧刷新");
                         xoffsetLeft = xoffsetLeft + distanceX;
                         xoffsetRight = 0;
+                        getParent().requestDisallowInterceptTouchEvent(true);
                         postInvalidate();
                     } else {
 
@@ -442,6 +443,7 @@ public class StockChartView extends View {
                         indexEnd = indexEndTemp;
                         indexBegin = indexBeginTemp;
 
+                        getParent().requestDisallowInterceptTouchEvent(true);
                         postInvalidate();
                     }
                 }
@@ -532,8 +534,8 @@ public class StockChartView extends View {
                     indexCount = indexCountTemp;
                     indexBegin = indexBeginTemp;
                     indexEnd = indexEndTemp;
-
-                    invalidate();
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    postInvalidate();
 
                 } else if (f > 1.0f) {
                     Log.e("yt", "onScale ==> 放大 " + f);
@@ -550,8 +552,8 @@ public class StockChartView extends View {
                     indexCount = indexCountTemp;
                     indexBegin = indexBeginTemp;
                     indexEnd = indexEndTemp;
-
-                    invalidate();
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    postInvalidate();
                 }
             }
 

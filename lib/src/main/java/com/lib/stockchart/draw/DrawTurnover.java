@@ -44,7 +44,7 @@ public class DrawTurnover implements IDraw {
         this.bottom = bottom1 - boardPadding;
         this.width = right - left;
         this.height = bottom - top;
-        Log.e("temp", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom);
+      //  Log.e("temp", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom);
     }
 
     @Override

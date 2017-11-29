@@ -1,5 +1,4 @@
 <resources>
-
     <declare-styleable name="StockChartView">
         <!-- 权重 - 上面 -->
         <attr name="scv_weight_top" format="integer" />
@@ -24,5 +23,4 @@
         <!-- 是否可以刷新  -->
         <attr name="scv_xoffset_enable" format="boolean" />
     </declare-styleable>
-
 </resources>

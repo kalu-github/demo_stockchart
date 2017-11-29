@@ -44,7 +44,7 @@ public class DrawKline implements IDraw {
         this.bottom = height * weightTop - xlabelHeight - boardPadding;
         this.width = width1;
         this.height = bottom - top;
-        Log.e("temp", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom);
+        Log.e("DrawKline", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom);
     }
 
     @Override
@@ -53,18 +53,19 @@ public class DrawKline implements IDraw {
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
             return;
 
+        Log.e("DrawKline", "onDrawNull ==> str = " + str + ", xlabelHeight = " + xlabelHeight + ", boardPadding = " + boardPadding);
+
         canvas.save();
-        // canvas.clipRect(left, top, right, bottom);
         drawBackground(canvas, -1, -1, -1, str, boardPadding);
         canvas.restore();
     }
 
     @Override
     public void onDrawData(BaseRender render, Canvas canvas, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding) {
-        //  Log.e("DrawKline", "onDrawData ==> pointSum = " + pointSum + ", pointBegin = " + pointBegin + ", pointEnd = " + pointEnd + ", minPrice = " + minPrice + ", maxPrice = " + maxPrice + ", maxTurnover = " + maxTurnover);
 
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
             return;
+        Log.e("DrawKline", "onDrawData ==>");
 
         canvas.save();
         // canvas.clipRect(left, top, right, bottom);
@@ -78,7 +79,7 @@ public class DrawKline implements IDraw {
         // 4.价格
         drawPrice(canvas, minPrice, maxPrice);
         // 高亮坐标
-        drawHightlight(canvas, xHighligh, yHighligh, pointBegin, pointEnd, xlabelHeight, boardPadding);
+        drawHightlight(canvas, xHighligh, yHighligh, pointBegin, pointEnd, boardPadding);
 
         canvas.restore();
     }
@@ -86,7 +87,11 @@ public class DrawKline implements IDraw {
     /**
      * 高亮
      */
-    private void drawHightlight(Canvas canvas, float xHighligh, float yHighligh, int pointBegin, int pointEnd, float xlabelHeight, float boardPadding) {
+    private void drawHightlight(Canvas canvas, float xHighligh, float yHighligh, int pointBegin, int pointEnd, float boardPadding) {
+
+        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
+            return;
+
         if (xHighligh == -1f || yHighligh == -1f) return;
 
         final List<Entry> entryList = EntryManager.getInstance().getEntryList();
@@ -138,6 +143,10 @@ public class DrawKline implements IDraw {
      * 背景
      */
     private void drawBackground(Canvas canvas, int entryCount, int entryBegin, int entryEnd, String str, float boardPadding) {
+
+        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
+            return;
+        Log.e("DrawKline", "drawBackground ==>");
 
         // X轴显示区域高度
         final float boardTemp = 2 * boardPadding;
@@ -212,6 +221,9 @@ public class DrawKline implements IDraw {
      */
     private void drawKline(Canvas canvas, int pointBegin, int pointEnd, float xoffsetLeft, float xoffsetRight) {
 
+        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
+            return;
+
         List<Entry> entryList = EntryManager.getInstance().getEntryList();
 
         final int pointWidth = EntryManager.getInstance().getPointWidth();
@@ -251,6 +263,9 @@ public class DrawKline implements IDraw {
      * MAD
      */
     private void drawMadline(Canvas canvas, int pointCount, int pointBegin, int pointEnd, float xoffsetLeft, float xoffsetRight) {
+
+        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
+            return;
 
         final List<Entry> entryList = EntryManager.getInstance().getEntryList();
         final int pointWidth = EntryManager.getInstance().getPointWidth();
@@ -312,6 +327,9 @@ public class DrawKline implements IDraw {
      * 价格
      */
     private void drawPrice(Canvas canvas, float minPrice, float maxPrice) {
+
+        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
+            return;
 
         Paint textPaint = StockPaint.getTextPaint(Paint.Align.LEFT, 20);
         // 最高价

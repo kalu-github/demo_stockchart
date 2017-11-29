@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -20,21 +19,21 @@
             android:paddingRight="10dp"
             android:paddingTop="10dp"
             app:scv_board_padding="2dp"
-            app:scv_hint_load="努力加载数据中..."
+            app:scv_hint_load="loading data..."
             app:scv_point_count="26"
             app:scv_point_max="70"
             app:scv_point_min="26"
             app:scv_point_space="4dp"
             app:scv_weight_down="1"
             app:scv_weight_top="4"
-            app:scv_xlabel_height="10dp"
+            app:scv_xlabel_height="5dp"
             app:scv_xoffset_enable="false"
             app:scv_xoffset_max="80dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_gravity="center"
+            android:layout_gravity="bottom"
             android:layout_marginTop="50dp">
 
             <Button

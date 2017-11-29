@@ -54,7 +54,7 @@ public abstract class BaseRender {
         this.bottom = bottom;
         this.width = right - left;
         this.height = bottom - top;
-        Log.e("BaseRender", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom + ", width = " + width + ", height = " + height);
+       // Log.e("BaseRender", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom + ", width = " + width + ", height = " + height);
 
         for (IDraw drawing : mDrawList) {
             drawing.onDrawInit(this.left, this.top, this.right, this.bottom, this.width, this.height,xlabelHeight, boardPadding);
