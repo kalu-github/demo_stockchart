@@ -1,7 +1,8 @@
 ![image](https://github.com/153437803/StockChart/blob/master/Screenrecorder-2017-11-29.gif )  
 
 ```
-<declare-styleable name="StockChartView">
+<resources>
+    <declare-styleable name="StockChartView">
         <!-- 权重 - 上面 -->
         <attr name="scv_weight_top" format="integer" />
         <!-- 权重 - 下面 -->
@@ -24,7 +25,8 @@
         <attr name="scv_xoffset_max" format="dimension|reference" />
         <!-- 是否可以刷新  -->
         <attr name="scv_xoffset_enable" format="boolean" />
-</declare-styleablew">
+    </declare-styleable>
+</resources>
 ```
 
 ```
