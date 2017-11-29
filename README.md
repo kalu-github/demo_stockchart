@@ -1,8 +1,9 @@
+[戳我下载, 体验DEMO](https://pan.baidu.com/s/1sl3FUs1)
+
 ![image](https://github.com/153437803/StockChart/blob/master/Screenrecorder-2017-11-29.gif )  
 
 ![image](https://github.com/153437803/StockChart/blob/master/20171130002727.png )
 
-[戳我下载, 体验DEMO](https://pan.baidu.com/s/1sl3FUs1)
 ```
 <declare-styleable name="StockChartView">
     <!-- 权重 - 上面 -->
