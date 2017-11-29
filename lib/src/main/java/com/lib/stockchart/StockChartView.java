@@ -50,10 +50,6 @@ public class StockChartView extends View {
     private float xlabelHeight = 25f;
     private float boardPadding = 5f;
 
-    // 时间戳
-//    private long timestamp = System.currentTimeMillis();
-
-
     private Context mContext = getContext().getApplicationContext();
     // 反弹速度
     private final ScrollerCompat scroller = ScrollerCompat.create(mContext, new Interpolator() {
@@ -63,15 +59,8 @@ public class StockChartView extends View {
         }
     });
 
-    // 与滚动控制、滑动加载数据相关的属性
     // 与手势控制相关的属性
     private boolean canDragXoffset = false;
-    //    private boolean enableRightRefresh = true;
-//    private boolean enableLeftRefresh = true;
-//    private boolean onDragging = true;
-//    private boolean onVerticalMove = false;
-//    private boolean onDoubleFingerPress = false;
-//    private boolean onTouch = false;
     // 长按高亮
     private boolean isLongPress = false;
 
@@ -129,22 +118,21 @@ public class StockChartView extends View {
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_HOVER_MOVE:
                 // 高亮
-                if (isLongPress) {
-                    // 高亮
-                    final float x = e.getX();
-                    final float y = e.getY();
+                if (!isLongPress) break;
+                // 高亮
+                final float x = e.getX();
+                final float y = e.getY();
 
-                    if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
-                        RenderManager.getInstance().getKlineRender().setxHighligh(x);
-                        RenderManager.getInstance().getKlineRender().setyHighligh(y);
-                        getParent().requestDisallowInterceptTouchEvent(true);
-                        postInvalidate();
-                    } else if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
-                        RenderManager.getInstance().getTlineRender().setxHighligh(x);
-                        RenderManager.getInstance().getTlineRender().setyHighligh(y);
-                        getParent().requestDisallowInterceptTouchEvent(true);
-                        postInvalidate();
-                    }
+                if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
+                    RenderManager.getInstance().getKlineRender().setxHighligh(x);
+                    RenderManager.getInstance().getKlineRender().setyHighligh(y);
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    postInvalidate();
+                } else if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
+                    RenderManager.getInstance().getTlineRender().setxHighligh(x);
+                    RenderManager.getInstance().getTlineRender().setyHighligh(y);
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    postInvalidate();
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -208,13 +196,6 @@ public class StockChartView extends View {
         int bottom = getBottom() - getPaddingBottom();
         RenderManager.getInstance().getKlineRender().onSizeChanged(left, top, right, bottom, xlabelHeight, boardPadding);
         RenderManager.getInstance().getTlineRender().onSizeChanged(left, top, right, bottom, xlabelHeight, boardPadding);
-
-        // 横屏
-//        if (getContext().getApplicationContext().getResources().getConfiguration().orientation != Configuration.ORIENTATION_PORTRAIT) {
-//            final boolean b = getVisibility() == View.VISIBLE;
-//
-//            Log.e("StockChartView", "onSizeChanged , 横屏 " + b);
-//        }
 
         // IDE预览模式下, 添加测试数据
         if (isInEditMode()) {
@@ -346,7 +327,6 @@ public class StockChartView extends View {
         EntryManager.getInstance().addData(entryData);
         // 3.界面刷新
         postInvalidate();
-
         //Log.e("StockChartView", "notifyDataSetChanged");
     }
 
@@ -398,79 +378,79 @@ public class StockChartView extends View {
                 return false;
             //  Log.e("kaluyyyy", "onScroll ==> distanceX = " + distanceX);
 
-            if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
+            if (RenderManager.getInstance().getRenderModel() != RenderManager.MODEL_KLINE_TURNOVER)
+                return false;
 
-                // 左划大于0
-                if (distanceX > 10f) {
+            // 左划大于0
+            if (distanceX > 10f) {
 
-                    // 滚动
-                    if (indexEnd == indexMax && canDragXoffset) {
+                // 滚动
+                if (indexEnd == indexMax && canDragXoffset) {
 
-                        if (Math.abs(xoffsetRight) >= xoffsetMax) {
-                            Log.e("rrrrr", "滑倒最右侧了");
-                            return false;
-                        }
+                    if (Math.abs(xoffsetRight) >= xoffsetMax) {
+                        Log.e("rrrrr", "滑倒最右侧了");
+                        return false;
+                    }
 
-                        xoffsetRight = xoffsetRight - distanceX;
-                        xoffsetLeft = 0;
+                    xoffsetRight = xoffsetRight - distanceX;
+                    xoffsetLeft = 0;
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    postInvalidate();
+                } else {
+
+                    scrollRange += distanceX;
+                    final int pointWidth = EntryManager.getInstance().getPointWidth();
+                    final float pointSpace = EntryManager.getInstance().getPointSpace();
+
+                    if (scrollRange >= (pointSpace + pointWidth)) {
+                        scrollRange = 0;
+                        final int indexEndTemp = indexEnd + 1;
+                        if (indexEndTemp >= indexMax) return false;
+
+                        final int indexBeginTemp = indexBegin + 1;
+                        if (indexBeginTemp <= 0) return false;
+
+                        indexEnd = indexEndTemp;
+                        indexBegin = indexBeginTemp;
                         getParent().requestDisallowInterceptTouchEvent(true);
                         postInvalidate();
-                    } else {
-
-                        scrollRange += distanceX;
-                        final int pointWidth = EntryManager.getInstance().getPointWidth();
-                        final float pointSpace = EntryManager.getInstance().getPointSpace();
-
-                        if (scrollRange >= (pointSpace + pointWidth)) {
-                            scrollRange = 0;
-                            final int indexEndTemp = indexEnd + 1;
-                            if (indexEndTemp >= indexMax) return false;
-
-                            final int indexBeginTemp = indexBegin + 1;
-                            if (indexBeginTemp <= 0) return false;
-
-                            indexEnd = indexEndTemp;
-                            indexBegin = indexBeginTemp;
-                            getParent().requestDisallowInterceptTouchEvent(true);
-                            postInvalidate();
-                        }
                     }
                 }
-                // 右划小于0
-                else if (distanceX < -10f) {
+            }
+            // 右划小于0
+            else if (distanceX < -10f) {
 
-                    if (indexBegin <= 0 && canDragXoffset) {
+                if (indexBegin <= 0 && canDragXoffset) {
 
-                        if (xoffsetLeft >= xoffsetMax) {
+                    if (xoffsetLeft >= xoffsetMax) {
 
-                            Log.e("rrrrr", "滑倒最左侧了");
-                            return false;
-                        }
+                        Log.e("rrrrr", "滑倒最左侧了");
+                        return false;
+                    }
 
-                        Log.e("rrrrr", "左侧刷新");
-                        xoffsetLeft = xoffsetLeft + distanceX;
-                        xoffsetRight = 0;
+                    Log.e("rrrrr", "左侧刷新");
+                    xoffsetLeft = xoffsetLeft + distanceX;
+                    xoffsetRight = 0;
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    postInvalidate();
+                } else {
+
+                    scrollRange += distanceX;
+                    final int pointWidth = EntryManager.getInstance().getPointWidth();
+                    final float pointSpace = EntryManager.getInstance().getPointSpace();
+                    if (Math.abs(scrollRange) >= (pointSpace + pointWidth)) {
+                        scrollRange = 0;
+                        final int indexEndTemp = indexEnd - 1;
+                        if (indexEndTemp >= indexMax) return false;
+
+                        final int indexBeginTemp = indexBegin - 1;
+                        if (indexBeginTemp <= 0) return false;
+
+                        indexEnd = indexEndTemp;
+                        indexBegin = indexBeginTemp;
+
                         getParent().requestDisallowInterceptTouchEvent(true);
                         postInvalidate();
-                    } else {
-
-                        scrollRange += distanceX;
-                        final int pointWidth = EntryManager.getInstance().getPointWidth();
-                        final float pointSpace = EntryManager.getInstance().getPointSpace();
-                        if (Math.abs(scrollRange) >= (pointSpace + pointWidth)) {
-                            scrollRange = 0;
-                            final int indexEndTemp = indexEnd - 1;
-                            if (indexEndTemp >= indexMax) return false;
-
-                            final int indexBeginTemp = indexBegin - 1;
-                            if (indexBeginTemp <= 0) return false;
-
-                            indexEnd = indexEndTemp;
-                            indexBegin = indexBeginTemp;
-
-                            getParent().requestDisallowInterceptTouchEvent(true);
-                            postInvalidate();
-                        }
                     }
                 }
             }
@@ -502,12 +482,6 @@ public class StockChartView extends View {
 //            }
 
             return super.onFling(e1, e2, velocityX, velocityY);
-        }
-
-        @Override
-        public void onShowPress(MotionEvent e) {
-            super.onShowPress(e);
-            Log.e("kaluyyyy", "onShowPress ==> x = " + e.getX());
         }
 
         @Override
