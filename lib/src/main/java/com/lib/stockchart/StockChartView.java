@@ -219,7 +219,7 @@ public class StockChartView extends View {
         // IDE预览模式下, 添加测试数据
         if (isInEditMode()) {
             final ArrayList<Entry> entries = StockDataTest.parseKLineData(StockDataTest.KLINE);
-            notifyDataSetChanged(entries);
+            addDataSetChanged(entries);
         }
     }
 
