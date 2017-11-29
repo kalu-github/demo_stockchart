@@ -22,17 +22,17 @@ public class TlineRender extends BaseRender {
         final List<IDraw> drawList = getDrawList();
 
         if (indexMax <= 0) {
-            Log.e("TlineRender", "onCanvas ==> 空数据");
+            // Log.e("TlineRender", "onCanvas ==> 空数据");
             for (IDraw drawing : drawList) {
                 drawing.onDrawNull(canvas, loadingStr, xlabelHeight, boardPadding);
             }
         } else {
-            Log.e("TlineRender", "onCanvas ==> 有数据");
+           // Log.e("TlineRender", "onCanvas ==> 有数据");
 
             final float minPrice = EntryManager.getInstance().calculatePriceMin(indexBegin, indexMax);
             final float maxPrice = EntryManager.getInstance().calculatePriceMax(indexBegin, indexMax);
             final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexMax);
-            calculateData(indexBegin, indexMax, indexMax, boardPadding);
+            calculateData(indexBegin, indexMax, indexMax, xlabelHeight, boardPadding);
 
             for (int i = 0; i < drawList.size(); i++) {
                 final IDraw temp = drawList.get(i);

@@ -47,7 +47,7 @@ public abstract class BaseRender {
     // 显示区域
     int left, top, right, bottom, width, height;
 
-    public void onSizeChanged(int left, int top, int right, int bottom, float boardPadding) {
+    public void onSizeChanged(int left, int top, int right, int bottom, float xlabelHeight, float boardPadding) {
         this.left = left;
         this.top = top;
         this.right = right;
@@ -57,21 +57,21 @@ public abstract class BaseRender {
         Log.e("BaseRender", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom + ", width = " + width + ", height = " + height);
 
         for (IDraw drawing : mDrawList) {
-            drawing.onDrawInit(this.left, this.top, this.right, this.bottom, this.width, this.height, boardPadding);
+            drawing.onDrawInit(this.left, this.top, this.right, this.bottom, this.width, this.height,xlabelHeight, boardPadding);
         }
     }
 
     /**
      * 计算数据
      */
-    void calculateData(int indexBegin, int indexEnd, int indexCount, float boardPadding) {
+    void calculateData(int indexBegin, int indexEnd, int indexCount, float xlabelHeight, float boardPadding) {
 
         final int weightTop = EntryManager.getInstance().getWeightTop();
         final int weightDown = EntryManager.getInstance().getWeightDown();
         final int weightSum = weightTop + weightDown;
 
         // 内边框边距
-        final float bottomSrc = height / weightSum * weightTop - boardPadding;
+        final float bottomSrc = height / weightSum * weightTop - boardPadding - xlabelHeight;
         final float heightSrc = bottomSrc - top - boardPadding;
 
         // 下部分, 成交量高度
@@ -117,8 +117,8 @@ public abstract class BaseRender {
             entry.setMa20Real(bottomSrc - (entry.getMa20() - priceMin) * heightSrc / priceSum);
             // 成交量
             entry.setVolumeReal(bottom - entry.getVolume() * heightBottom / turnoverMax);
-            entry.setVolumeMa5Real((float) (bottom - entry.getVolumeMa5() * heightBottom / turnoverMax));
-            entry.setVolumeMa10Real((float) (bottom - entry.getVolumeMa10() * heightBottom / turnoverMax));
+            entry.setVolumeMa5Real(bottom - entry.getVolumeMa5() * heightBottom / turnoverMax);
+            entry.setVolumeMa10Real(bottom - entry.getVolumeMa10() * heightBottom / turnoverMax);
         }
     }
 

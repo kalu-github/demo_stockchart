@@ -204,8 +204,8 @@ public class StockChartView extends View {
         int top = getTop() + getPaddingTop();
         int right = getRight() - getPaddingRight();
         int bottom = getBottom() - getPaddingBottom();
-        RenderManager.getInstance().getKlineRender().onSizeChanged(left, top, right, bottom, boardPadding);
-        RenderManager.getInstance().getTlineRender().onSizeChanged(left, top, right, bottom, boardPadding);
+        RenderManager.getInstance().getKlineRender().onSizeChanged(left, top, right, bottom, xlabelHeight, boardPadding);
+        RenderManager.getInstance().getTlineRender().onSizeChanged(left, top, right, bottom, xlabelHeight, boardPadding);
 
         // 横屏
 //        if (getContext().getApplicationContext().getResources().getConfiguration().orientation != Configuration.ORIENTATION_PORTRAIT) {

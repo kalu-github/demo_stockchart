@@ -19,9 +19,10 @@ public interface IDraw {
      * @param bottom       下
      * @param width        宽
      * @param height       高
+     * @param xlabelHeight K线图, 分时图, x坐标轴文字信息显示区域高度
      * @param boardPadding 边框内边距
      */
-    void onDrawInit(int left, int top, int right, int bottom, int width, int height, float boardPadding);
+    void onDrawInit(int left, int top, int right, int bottom, int width, int height, float xlabelHeight, float boardPadding);
 
     /**
      * 网络加载数据, 等待过程的显示信息

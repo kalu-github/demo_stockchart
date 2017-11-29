@@ -177,7 +177,7 @@ public class EntryManager {
             if (i == start) {
                 temp = max3;
             } else {
-                temp = Math.max(temp, high);
+                temp = Math.max(temp, max3);
             }
         }
         return temp;
@@ -202,7 +202,7 @@ public class EntryManager {
             if (i == start) {
                 temp = min3;
             } else {
-                temp = Math.min(temp, low);
+                temp = Math.min(temp, min3);
             }
         }
         return temp;

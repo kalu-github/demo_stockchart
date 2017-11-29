@@ -30,7 +30,7 @@ public class DrawTline implements IDraw {
 
 
     @Override
-    public void onDrawInit(int left1, int top1, int right1, int bottom1, int width1, int height1, float boardPadding) {
+    public void onDrawInit(int left1, int top1, int right1, int bottom1, int width1, int height1, float xlabelHeight, float boardPadding) {
 
         // 测试, 高度
         final int weightTop = EntryManager.getInstance().getWeightTop();
@@ -86,33 +86,32 @@ public class DrawTline implements IDraw {
      * 高亮
      */
     private void drawHightlight(Canvas canvas, float xHighligh, float yHighligh, int pointCount, int pointBegin, int pointEnd, float xlabelHeight, float boardPadding) {
-
         if (xHighligh == -1f || yHighligh == -1f) return;
 
         final List<Entry> entryList = EntryManager.getInstance().getEntryList();
         final int pointWidth = EntryManager.getInstance().getPointWidth();
 
-        final Entry entryBegin = entryList.get(pointBegin - 1);
+        final Entry entryBegin = entryList.get(pointBegin);
         final float xBegin = entryBegin.getxLabelReal() + pointWidth / 2;
 
-        final Entry entryEnd = entryList.get(pointEnd - 1);
+        final Entry entryEnd = entryList.get(pointEnd);
         final float xEnd = entryEnd.getxLabelReal() + pointWidth / 2;
 
         if (xHighligh <= xBegin) {
             // 横线
-            final float y = entryList.get(pointBegin - 1).getOpenReal();
-            canvas.drawLine(left + boardPadding, y, right - boardPadding, y, StockPaint.getLinePaint(Color.BLACK));
+            final float y = entryList.get(pointBegin).getOpenReal();
+            canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
             // 竖线
             final float x = boardPadding + left + pointWidth / 2;
-            canvas.drawLine(x, top + boardPadding, x, bottomF - boardPadding - xlabelHeight, StockPaint.getLinePaint(Color.BLACK));
+            canvas.drawLine(x, top, x, bottomF, StockPaint.getLinePaint(Color.BLACK));
         } else if (xHighligh >= xEnd) {
             // 横线
-            final float y = entryList.get(pointEnd - 1).getOpenReal();
-            canvas.drawLine(left + boardPadding, y, right - boardPadding, y, StockPaint.getLinePaint(Color.BLACK));
+            final float y = entryList.get(pointEnd).getOpenReal();
+            canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
             // 竖线
-            canvas.drawLine(xEnd, top + boardPadding, xEnd, bottomF - boardPadding - xlabelHeight, StockPaint.getLinePaint(Color.BLACK));
+            canvas.drawLine(xEnd, top, xEnd, bottomF, StockPaint.getLinePaint(Color.BLACK));
         } else {
-            for (int i = pointBegin; i < Math.min(pointEnd, pointBegin + pointCount); i++) {
+            for (int i = pointBegin; i <= pointEnd; i++) {
 
                 final Entry entry1 = entryList.get(i);
                 final float tempx1 = entry1.getxLabelReal();
@@ -124,10 +123,10 @@ public class DrawTline implements IDraw {
 
                 if (xHighligh > x1 && xHighligh < x2) {
                     // 横线
-                    final float y = entryList.get(i - 1).getOpenReal();
-                    canvas.drawLine(left + boardPadding, y, right - boardPadding, y, StockPaint.getLinePaint(Color.BLACK));
+                    final float y = entryList.get(i).getOpenReal();
+                    canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
                     // 竖线
-                    canvas.drawLine(x1, top + boardPadding, x1, bottomF - boardPadding - xlabelHeight, StockPaint.getLinePaint(Color.BLACK));
+                    canvas.drawLine(x1, top, x1, bottomF, StockPaint.getLinePaint(Color.BLACK));
                     break;
                 }
             }

@@ -29,7 +29,7 @@ public class KlineRender extends BaseRender {
             }
         } else {
 
-            calculateData(indexBegin, indexEnd, indexCount, boardPadding);
+            calculateData(indexBegin, indexEnd, indexCount, xlabelHeight, boardPadding);
             Log.e("KlineRender", "onCanvas ==> indexBegin = " + indexBegin + ", indexEnd = " + indexEnd+", indexCount = "+indexCount);
 
             final float minPrice = EntryManager.getInstance().calculatePriceMin(indexBegin, indexEnd);
