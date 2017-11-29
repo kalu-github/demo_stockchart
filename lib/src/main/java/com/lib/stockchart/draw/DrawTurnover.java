@@ -139,19 +139,46 @@ public class DrawTurnover implements IDraw {
         // 1.边框
         canvas.drawRect(left - 2 * boardPadding, top - 2 * boardPadding, right + 2 * boardPadding, bottom + 2 * boardPadding, StockPaint.getBorderPaint(3));
 
-        // 4条横线 - 虚线
-        float y = (bottom - top) / 2 + top;
-        float startX = left - boardPadding;
-        float stopX = right + boardPadding;
-        canvas.drawLine(startX, y, stopX, y, StockPaint.getDashPaint());
+        // 2条横线 - 虚线
+        float temp = height / 2;
+        final float x1 = left + 2;
+        final float x2 = x1 + 5;
+
+        for (int j = 1; j < 2; j++) {
+
+            float Y = top + j * temp;
+            float[] ptsDash = new float[]{x1, 0, x2, 0};
+            ptsDash[1] = ptsDash[3] = Y;
+
+            while (ptsDash[0] <= right) {
+                canvas.drawLines(ptsDash, StockPaint.getDashPaint());
+
+                final float x1Temp = ptsDash[0];
+                final float x2Temp = ptsDash[2];
+                ptsDash[0] = x1Temp + 15;
+                ptsDash[2] = Math.min(x2Temp + 15, right);
+            }
+        }
 
         // 4条竖线 - 虚线
         float temp2 = width / 5;
-        for (int i = 1; i < 5; i++) {
-            float startY = top - boardPadding;
-            float x = left + i * temp2;
-            float stopY = bottom + boardPadding;
-            canvas.drawLine(x, startY, x, stopY, StockPaint.getDashPaint());
+        final float y1 = top + 2;
+        final float y2 = top + 5;
+
+        for (int j = 1; j < 5; j++) {
+
+            float X = left + j * temp2;
+            float[] ptsDash = new float[]{0, y1, 0, y2};
+            ptsDash[0] = ptsDash[2] = X;
+
+            while (ptsDash[1] <= bottom) {
+                canvas.drawLines(ptsDash, StockPaint.getDashPaint());
+
+                final float x1Temp = ptsDash[1];
+                final float x2Temp = ptsDash[3];
+                ptsDash[1] = x1Temp + 15;
+                ptsDash[3] = Math.min(x2Temp + 15, bottom);
+            }
         }
 
         // 文字交易量

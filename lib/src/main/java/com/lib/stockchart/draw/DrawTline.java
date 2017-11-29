@@ -150,18 +150,44 @@ public class DrawTline implements IDraw {
 
         // 4条横线 - 虚线
         float temp = height / 5;
-        for (int i = 1; i < 5; i++) {
-            float startX = left;
-            float Y = top + i * temp;
-            canvas.drawLine(startX, Y, right, Y, StockPaint.getDashPaint());
+        final float x1 = left + 2;
+        final float x2 = x1 + 5;
+
+        for (int j = 1; j < 5; j++) {
+
+            float Y = top + j * temp;
+            float[] ptsDash = new float[]{x1, 0, x2, 0};
+            ptsDash[1] = ptsDash[3] = Y;
+
+            while (ptsDash[0] <= right) {
+                canvas.drawLines(ptsDash, StockPaint.getDashPaint());
+
+                final float x1Temp = ptsDash[0];
+                final float x2Temp = ptsDash[2];
+                ptsDash[0] = x1Temp + 15;
+                ptsDash[2] = Math.min(x2Temp + 15, right);
+            }
         }
 
         // 4条竖线 - 虚线
         float temp2 = width / 5;
-        for (int i = 1; i < 5; i++) {
-            float startY = top;
-            float x = left + i * temp2;
-            canvas.drawLine(x, startY, x, bottom, StockPaint.getDashPaint());
+        final float y1 = top + 2;
+        final float y2 = top + 5;
+
+        for (int j = 1; j < 5; j++) {
+
+            float X = left + j * temp2;
+            float[] ptsDash = new float[]{0, y1, 0, y2};
+            ptsDash[0] = ptsDash[2] = X;
+
+            while (ptsDash[1] <= bottom) {
+                canvas.drawLines(ptsDash, StockPaint.getDashPaint());
+
+                final float x1Temp = ptsDash[1];
+                final float x2Temp = ptsDash[3];
+                ptsDash[1] = x1Temp + 15;
+                ptsDash[3] = Math.min(x2Temp + 15, bottom);
+            }
         }
 
         if (!TextUtils.isEmpty(str)) {

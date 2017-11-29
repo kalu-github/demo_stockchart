@@ -1,6 +1,7 @@
 package com.lib.stockchart.paint;
 
 import android.graphics.Color;
+import android.graphics.CornerPathEffect;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 
@@ -47,7 +48,6 @@ public class StockPaint {
         mPaint.setColor(Color.GRAY);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(2);
-        mPaint.setPathEffect(new DashPathEffect(new float[]{5, 5}, 0));
 
         return mPaint;
     }
@@ -92,6 +92,7 @@ public class StockPaint {
     public static Paint getLinePaint(int color) {
 
         mPaint.setAntiAlias(true);
+        mPaint.setPathEffect(new CornerPathEffect(5f)); // 拐点顺滑
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setFakeBoldText(true);
