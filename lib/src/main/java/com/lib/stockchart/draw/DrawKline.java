@@ -44,7 +44,7 @@ public class DrawKline implements IDraw {
         this.bottom = height * weightTop - xlabelHeight - boardPadding;
         this.width = width1;
         this.height = bottom - top;
-        Log.e("DrawKline", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom);
+      //  Log.e("DrawKline", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class DrawKline implements IDraw {
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
             return;
 
-        Log.e("DrawKline", "onDrawNull ==> str = " + str + ", xlabelHeight = " + xlabelHeight + ", boardPadding = " + boardPadding);
+      //  Log.e("DrawKline", "onDrawNull ==> str = " + str + ", xlabelHeight = " + xlabelHeight + ", boardPadding = " + boardPadding);
 
         canvas.save();
         drawBackground(canvas, -1, -1, -1, str, boardPadding);
@@ -65,7 +65,7 @@ public class DrawKline implements IDraw {
 
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
             return;
-        Log.e("DrawKline", "onDrawData ==>");
+      //  Log.e("DrawKline", "onDrawData ==>");
 
         canvas.save();
         // canvas.clipRect(left, top, right, bottom);
@@ -146,7 +146,7 @@ public class DrawKline implements IDraw {
 
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
             return;
-        Log.e("DrawKline", "drawBackground ==>");
+      //  Log.e("DrawKline", "drawBackground ==>");
 
         // X轴显示区域高度
         final float boardTemp = 2 * boardPadding;

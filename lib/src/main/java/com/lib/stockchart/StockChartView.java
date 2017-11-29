@@ -37,6 +37,7 @@ public class StockChartView extends View {
     private int indexBegin = 0; // 起始下标索引
     private int indexCount = 50; // 默认显示50个点
     private int indexMax = 0; // 真实索引最大值
+    private float scrollRange = 0; // 滑动距离
 
     // 自定义属性
     private int pointCountMin = 70;
@@ -182,7 +183,7 @@ public class StockChartView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Log.e("StockChartView", "onDraw ==>");
+        // Log.e("StockChartView", "onDraw ==>");
 
         final int model = RenderManager.getInstance().getRenderModel();
 
@@ -196,7 +197,7 @@ public class StockChartView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        Log.e("StockChartView", "onSizeChanged ==>");
+        //  Log.e("StockChartView", "onSizeChanged ==>");
 
         int left = getLeft() + getPaddingLeft();
         int top = getTop() + getPaddingTop();
@@ -335,7 +336,7 @@ public class StockChartView extends View {
         // 3.界面刷新
         postInvalidate();
 
-        Log.e("StockChartView", "notifyDataSetChanged");
+        //Log.e("StockChartView", "notifyDataSetChanged");
     }
 
     private final GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
@@ -383,7 +384,7 @@ public class StockChartView extends View {
 
             if (indexMax == 0 || Math.abs(distanceY) > Math.abs(distanceX) || e1.getPointerCount() != 1 || e2.getPointerCount() != 1)
                 return false;
-            Log.e("kaluyyyy", "onScroll ==> distanceX = " + distanceX);
+            //  Log.e("kaluyyyy", "onScroll ==> distanceX = " + distanceX);
 
             if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
 
@@ -404,16 +405,23 @@ public class StockChartView extends View {
                         postInvalidate();
                     } else {
 
-                        final int indexEndTemp = indexEnd + 1;
-                        if (indexEndTemp >= indexMax) return false;
+                        scrollRange += distanceX;
+                        final int pointWidth = EntryManager.getInstance().getPointWidth();
+                        final float pointSpace = EntryManager.getInstance().getPointSpace();
 
-                        final int indexBeginTemp = indexBegin + 1;
-                        if (indexBeginTemp <= 0) return false;
+                        if (scrollRange >= (pointSpace + pointWidth)) {
+                            scrollRange = 0;
+                            final int indexEndTemp = indexEnd + 1;
+                            if (indexEndTemp >= indexMax) return false;
 
-                        indexEnd = indexEndTemp;
-                        indexBegin = indexBeginTemp;
-                        getParent().requestDisallowInterceptTouchEvent(true);
-                        postInvalidate();
+                            final int indexBeginTemp = indexBegin + 1;
+                            if (indexBeginTemp <= 0) return false;
+
+                            indexEnd = indexEndTemp;
+                            indexBegin = indexBeginTemp;
+                            getParent().requestDisallowInterceptTouchEvent(true);
+                            postInvalidate();
+                        }
                     }
                 }
                 // 右划小于0
@@ -434,17 +442,23 @@ public class StockChartView extends View {
                         postInvalidate();
                     } else {
 
-                        final int indexEndTemp = indexEnd - 1;
-                        if (indexEndTemp >= indexMax) return false;
+                        scrollRange += distanceX;
+                        final int pointWidth = EntryManager.getInstance().getPointWidth();
+                        final float pointSpace = EntryManager.getInstance().getPointSpace();
+                        if (Math.abs(scrollRange) >= (pointSpace + pointWidth)) {
+                            scrollRange = 0;
+                            final int indexEndTemp = indexEnd - 1;
+                            if (indexEndTemp >= indexMax) return false;
 
-                        final int indexBeginTemp = indexBegin - 1;
-                        if (indexBeginTemp <= 0) return false;
+                            final int indexBeginTemp = indexBegin - 1;
+                            if (indexBeginTemp <= 0) return false;
 
-                        indexEnd = indexEndTemp;
-                        indexBegin = indexBeginTemp;
+                            indexEnd = indexEndTemp;
+                            indexBegin = indexBeginTemp;
 
-                        getParent().requestDisallowInterceptTouchEvent(true);
-                        postInvalidate();
+                            getParent().requestDisallowInterceptTouchEvent(true);
+                            postInvalidate();
+                        }
                     }
                 }
             }
