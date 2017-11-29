@@ -1,10 +1,5 @@
 package com.lib.stockchart.entry;
 
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.TextureView;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
