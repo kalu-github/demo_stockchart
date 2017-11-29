@@ -6,8 +6,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.View;
 
+import com.lib.stockchart.OnStockChartChangeListener;
 import com.lib.stockchart.OnStockChartChangeListenerSimple;
 import com.lib.stockchart.StockChartView;
 import com.lib.stockchart.entry.Entry;
@@ -126,11 +128,16 @@ public class MainActivity extends AppCompatActivity {
                 final int model = RenderManager.getInstance().getRenderModel();
                 if (model == RenderManager.MODEL_TLINE_TURNOVER) {
                     final List<Entry> entries = aVoid.subList(0, 100);
-                    mStockChartView.notifyDataSetChanged(entries);
+                    mStockChartView.addDataSetChanged(entries);
                 } else if (model == RenderManager.MODEL_KLINE_TURNOVER) {
-                    mStockChartView.notifyDataSetChanged(aVoid);
+                    mStockChartView.addDataSetChanged(aVoid);
+
+
                 }
             }
         }.execute();
+
+
+
     }
 }

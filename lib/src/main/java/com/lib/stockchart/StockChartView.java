@@ -312,6 +312,9 @@ public class StockChartView extends View {
 
     /**********************************************************************************************/
 
+    /**
+     * 清空数据
+     */
     public void clearDataSetChanged() {
         EntryManager.getInstance().resetData();
         indexBegin = 0;
@@ -319,7 +322,12 @@ public class StockChartView extends View {
         indexEnd = 0;
     }
 
-    public void notifyDataSetChanged(List<Entry> entryData) {
+    /**
+     * 添加数据
+     *
+     * @param entryData 数据集合
+     */
+    public void addDataSetChanged(List<Entry> entryData) {
 
         if (null == entryData || entryData.size() == 0) return;
 
