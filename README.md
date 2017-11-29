@@ -49,6 +49,42 @@
             app:scv_xoffset_max="80dp" />
 ```
 ```
+使用方法：
+
+1.添加数据, 即刷新界面
+StockChartView.addDataSetChanged(List<Entey>);
+2.删除数据
+StockChartView.clearDataSetChanged();
+3.监听
+StockChartView.setOnStockChartChangeListener(new OnStockChartChangeListener() {
+                        @Override
+                        public void onLeftRefresh() {
+                            
+                        }
+
+                        @Override
+                        public void onRightRefresh() {
+
+                        }
+
+                        @Override
+                        public void onSingleTap(MotionEvent e, float x, float y) {
+
+                        }
+
+                        @Override
+                        public void onDoubleTap(MotionEvent e, float x, float y) {
+
+                        }
+
+                        @Override
+                        public void onHighlight(Entry entry, int entryIndex, float x, float y) {
+
+                        }
+});
+
+```
+```
 todo list：
 
 1.横竖屏切换，无画面（已解决）
