@@ -3,6 +3,9 @@
 ![image](https://github.com/153437803/StockChart/blob/master/20171130002727.png )
 
 ```
+[体验DEMO](https://d.pcs.baidu.com/file/63c49d59212f4042405bbcce40949f99?fid=1044283962-250528-187513777395897&time=1511974589&rt=pr&sign=FDTAERVCY-DCb740ccc5511e5e8fedcff06b081203-SnSFVkklR2wyuTkoNaJTcjxPrx4%3D&expires=8h&chkv=1&chkbd=1&chkpc=et&dp-logid=7724120003260914964&dp-callid=0&r=299520420)
+```
+```
 <declare-styleable name="StockChartView">
     <!-- 权重 - 上面 -->
     <attr name="scv_weight_top" format="integer" />
