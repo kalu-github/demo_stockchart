@@ -117,7 +117,7 @@ public class DrawTurnover implements IDraw {
             canvas.drawRect(left, isMin ? (bottom - boardPadding) : top, right, bottom, StockPaint.getTurnoverPaint());
         }
 
-        // drawMadline(canvas, pointCount, pointBegin, pointEnd);
+        drawMadline(canvas, pointCount, pointBegin, pointEnd, xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
 
         // 文字交易量
         Paint textPaint = StockPaint.getTextPaint(Paint.Align.LEFT, 20);
@@ -229,10 +229,9 @@ public class DrawTurnover implements IDraw {
 
             final Entry entry = entryList.get(i);
 
-            final float tempx = entry.getxLabelReal();
-            final float x = tempx + pointWidth / 2 + xoffsetLeft + xoffsetRight;
-            final float y1 = top + entry.getVolumeMa5Real() + boardPadding;
-            final float y2 = top + entry.getVolumeMa10Real() + boardPadding;
+            final float x = entry.getxLabelReal() + pointWidth / 2 + xoffsetLeft + xoffsetRight;
+            final float y1 = entry.getVolumeMa5Real();
+            final float y2 = entry.getVolumeMa10Real();
             // Log.e("uuuu", "i = " + (i - 1) + ", x = " + x + ", y1 = " + y1 + ", y2 = " + y2);
 
             final int tempi = i - pointBegin;

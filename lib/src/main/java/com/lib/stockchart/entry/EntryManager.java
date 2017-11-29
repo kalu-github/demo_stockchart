@@ -214,11 +214,15 @@ public class EntryManager {
 
         for (int i = start; i <= end; i++) {
             Entry entry = entries.get(i);
-            float high = entry.getVolume();
+            final float ma5 = entry.getVolumeMa5();
+            final float ma10 = entry.getVolumeMa10();
+            final float high = entry.getVolume();
+            final float max1 = Math.max(ma5, ma10);
+            final float max2 = Math.max(max1, high);
             if (i == start) {
-                temp = high;
+                temp = max2;
             } else {
-                temp = Math.max(temp, high);
+                temp = Math.max(temp, max2);
             }
         }
         return temp;

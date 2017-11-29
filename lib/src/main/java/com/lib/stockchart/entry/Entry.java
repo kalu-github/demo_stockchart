@@ -117,8 +117,8 @@ public class Entry {
     private String xLabel; // X 轴标签
 
     // 量的5日平均和10日平均
-    private double volumeMa5;
-    private double volumeMa10;
+    private float volumeMa5;
+    private float volumeMa10;
 
     // MA 指标的三个属性
     private float ma5;
@@ -232,19 +232,19 @@ public class Entry {
         this.ma20 = ma20;
     }
 
-    public double getVolumeMa5() {
+    public float getVolumeMa5() {
         return volumeMa5;
     }
 
-    public void setVolumeMa5(double volumeMa5) {
+    public void setVolumeMa5(float volumeMa5) {
         this.volumeMa5 = volumeMa5;
     }
 
-    public double getVolumeMa10() {
+    public float getVolumeMa10() {
         return volumeMa10;
     }
 
-    public void setVolumeMa10(double volumeMa10) {
+    public void setVolumeMa10(float volumeMa10) {
         this.volumeMa10 = volumeMa10;
     }
 
