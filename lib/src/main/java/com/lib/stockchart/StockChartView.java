@@ -38,7 +38,7 @@ public class StockChartView extends View {
     private int indexCount = 50; // 默认显示50个点
     private int indexMax = 0; // 真实索引最大值
     private float scrollRange = 0; // 滑动距离
-    private float scaleCount = 0;
+    private float scaleCount = 0; // 缩放次数
 
     // 自定义属性
     private int pointCountMin = 70;
@@ -137,10 +137,12 @@ public class StockChartView extends View {
                     if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
                         RenderManager.getInstance().getKlineRender().setxHighligh(x);
                         RenderManager.getInstance().getKlineRender().setyHighligh(y);
+                        getParent().requestDisallowInterceptTouchEvent(true);
                         postInvalidate();
                     } else if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
                         RenderManager.getInstance().getTlineRender().setxHighligh(x);
                         RenderManager.getInstance().getTlineRender().setyHighligh(y);
+                        getParent().requestDisallowInterceptTouchEvent(true);
                         postInvalidate();
                     }
                 }
@@ -363,18 +365,19 @@ public class StockChartView extends View {
             if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
                 RenderManager.getInstance().getKlineRender().setxHighligh(x);
                 RenderManager.getInstance().getKlineRender().setyHighligh(y);
+                getParent().requestDisallowInterceptTouchEvent(true);
                 postInvalidate();
             } else if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
                 RenderManager.getInstance().getTlineRender().setxHighligh(x);
                 RenderManager.getInstance().getTlineRender().setyHighligh(y);
+                getParent().requestDisallowInterceptTouchEvent(true);
                 postInvalidate();
             }
-
-//                if (null != listener) {
-//                    final int pointHighlight = EntryManager.getInstance().getPointHighlight();
-//                    final Entry entry = EntryManager.getInstance().getEntryList().get(pointHighlight);
-//                    listener.onHighlight(entry, pointHighlight, x, y);
-//                }
+//            if (null != listener) {
+//                final int pointHighlight = EntryManager.getInstance().getPointHighlight();
+//                final Entry entry = EntryManager.getInstance().getEntryList().get(pointHighlight);
+//                listener.onHighlight(entry, pointHighlight, x, y);
+//            }
         }
 
         /**
@@ -535,7 +538,7 @@ public class StockChartView extends View {
             float f = detector.getScaleFactor();
 
             if (f < 1.0f) {
-               // Log.e("yt", "onScale ==> 缩小 " + f);
+                // Log.e("yt", "onScale ==> 缩小 " + f);
 
                 // 最右边
                 if (indexEnd >= indexMax) {
@@ -580,7 +583,7 @@ public class StockChartView extends View {
                     postInvalidate();
                 }
             } else if (f > 1.0f) {
-               // Log.e("yt", "onScale ==> 放大 " + f);
+                // Log.e("yt", "onScale ==> 放大 " + f);
 
                 // 最右边
                 if (indexEnd >= indexMax) {
