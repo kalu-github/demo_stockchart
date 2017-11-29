@@ -198,10 +198,9 @@ public class StockChartView extends View {
         RenderManager.getInstance().getTlineRender().onSizeChanged(left, top, right, bottom, xlabelHeight, boardPadding);
 
         // IDE预览模式下, 添加测试数据
-        if (isInEditMode()) {
-            final ArrayList<Entry> entries = StockDataTest.parseKLineData(StockDataTest.KLINE);
-            addDataSetChanged(entries);
-        }
+        if (!isInEditMode()) return;
+        final ArrayList<Entry> entries = StockDataTest.parseKLineData(StockDataTest.KLINE);
+        addDataSetChanged(entries);
     }
 
 //    @Override
