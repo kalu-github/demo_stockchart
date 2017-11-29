@@ -15,7 +15,7 @@ public class Entry {
     private float ma20Real;
     private float volumeMa5Real;
     private float volumeMa10Real;
-    private int volumeReal; // 量_坐标值
+    private float volumeReal; // 量_坐标值
     private float xLabelReal; // X 轴标签
 
     public float getVolumeMa5Real() {
@@ -90,11 +90,11 @@ public class Entry {
         this.closeReal = closeReal;
     }
 
-    public int getVolumeReal() {
+    public float getVolumeReal() {
         return volumeReal;
     }
 
-    public void setVolumeReal(int volumeReal) {
+    public void setVolumeReal(float volumeReal) {
         this.volumeReal = volumeReal;
     }
 

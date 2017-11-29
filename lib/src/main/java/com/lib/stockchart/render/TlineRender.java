@@ -32,7 +32,7 @@ public class TlineRender extends BaseRender {
             final float minPrice = EntryManager.getInstance().calculatePriceMin(indexBegin, indexMax);
             final float maxPrice = EntryManager.getInstance().calculatePriceMax(indexBegin, indexMax);
             final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexMax);
-            calculateData(indexBegin, indexMax, indexMax, xlabelHeight, boardPadding);
+            calculateData(indexBegin, indexMax, indexMax, boardPadding);
 
             for (int i = 0; i < drawList.size(); i++) {
                 final IDraw temp = drawList.get(i);

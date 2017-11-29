@@ -64,15 +64,18 @@ public abstract class BaseRender {
     /**
      * 计算数据
      */
-    void calculateData(int indexBegin, int indexEnd, int indexCount, float xlabelHeight, float boardPadding) {
+    void calculateData(int indexBegin, int indexEnd, int indexCount, float boardPadding) {
 
         final int weightTop = EntryManager.getInstance().getWeightTop();
         final int weightDown = EntryManager.getInstance().getWeightDown();
         final int weightSum = weightTop + weightDown;
 
         // 内边框边距
-        final float bottomSrc = height / weightSum * weightTop - boardPadding - xlabelHeight;
+        final float bottomSrc = height / weightSum * weightTop - boardPadding;
         final float heightSrc = bottomSrc - top - boardPadding;
+
+        // 下部分, 成交量高度
+        final float heightBottom = height / weightSum * weightDown - boardPadding;
 
         // 点与点间隙
         final float pointSpace = EntryManager.getInstance().getPointSpace();
@@ -113,9 +116,9 @@ public abstract class BaseRender {
             entry.setMa10Real(bottomSrc - (entry.getMa10() - priceMin) * heightSrc / priceSum);
             entry.setMa20Real(bottomSrc - (entry.getMa20() - priceMin) * heightSrc / priceSum);
             // 成交量
-            entry.setVolumeReal((int) (bottomSrc - entry.getVolume() * height / turnoverMax));
-            entry.setVolumeMa5Real((int) (bottomSrc - entry.getVolumeMa5() * height / turnoverMax));
-            entry.setVolumeMa10Real((int) (bottomSrc - entry.getVolumeMa10() * height / turnoverMax));
+            entry.setVolumeReal(bottom - entry.getVolume() * heightBottom / turnoverMax);
+            entry.setVolumeMa5Real((float) (bottom - entry.getVolumeMa5() * heightBottom / turnoverMax));
+            entry.setVolumeMa10Real((float) (bottom - entry.getVolumeMa10() * heightBottom / turnoverMax));
         }
     }
 

@@ -108,7 +108,9 @@ public class DrawTurnover implements IDraw {
 
             float left = entry.getxLabelReal() + xoffsetLeft + xoffsetRight;
             float right = left + pointWidth;
-            float top = bottom - entry.getVolume() * height / maxTurnover;
+            // float top = bottom - entry.getVolume() * height / maxTurnover;
+
+            float top = entry.getVolumeReal();
 
             boolean isMin = Math.abs(top - bottom) < 1.f;
             // 成交量非常小画一条直线
@@ -168,27 +170,27 @@ public class DrawTurnover implements IDraw {
         final List<Entry> entryList = EntryManager.getInstance().getEntryList();
         final int pointWidth = EntryManager.getInstance().getPointWidth();
 
-        final Entry entryBegin = entryList.get(pointBegin - 1);
+        final Entry entryBegin = entryList.get(pointBegin);
         final float xBegin = entryBegin.getxLabelReal() + pointWidth / 2;
 
-        final Entry entryEnd = entryList.get(pointEnd - 1);
+        final Entry entryEnd = entryList.get(pointEnd);
         final float xEnd = entryEnd.getxLabelReal() + pointWidth / 2;
 
         if (xHighligh <= xBegin) {
             // 横线
-            final float y = entryList.get(pointBegin - 1).getOpenReal();
+            final float y = entryList.get(pointBegin).getVolumeReal();
             canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
             // 竖线
             final float x = boardPadding + left + pointWidth / 2;
             canvas.drawLine(x, top, x, bottom, StockPaint.getLinePaint(Color.BLACK));
         } else if (xHighligh >= xEnd) {
             // 横线
-            final float y = entryList.get(pointEnd - 1).getOpenReal();
+            final float y = entryList.get(pointEnd).getVolumeReal();
             canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
             // 竖线
             canvas.drawLine(xEnd, top, xEnd, bottom, StockPaint.getLinePaint(Color.BLACK));
         } else {
-            for (int i = pointBegin; i < Math.min(pointEnd, pointBegin + pointCount); i++) {
+            for (int i = pointBegin; i <= pointEnd; i++) {
 
                 final Entry entry1 = entryList.get(i);
                 final float tempx1 = entry1.getxLabelReal();
@@ -200,7 +202,7 @@ public class DrawTurnover implements IDraw {
 
                 if (xHighligh > x1 && xHighligh < x2) {
                     // 横线
-                    final float y = entryList.get(i - 1).getOpenReal();
+                    final float y = entryList.get(i).getVolumeReal();
                     canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
                     // 竖线
                     canvas.drawLine(x1, top, x1, bottom, StockPaint.getLinePaint(Color.BLACK));

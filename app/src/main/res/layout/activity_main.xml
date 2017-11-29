@@ -28,7 +28,7 @@
             app:scv_weight_down="1"
             app:scv_weight_top="4"
             app:scv_xlabel_height="10dp"
-            app:scv_xoffset_enable="true"
+            app:scv_xoffset_enable="false"
             app:scv_xoffset_max="80dp" />
 
         <LinearLayout
