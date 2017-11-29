@@ -38,6 +38,7 @@ public class StockChartView extends View {
     private int indexCount = 50; // 默认显示50个点
     private int indexMax = 0; // 真实索引最大值
     private float scrollRange = 0; // 滑动距离
+    private float scaleCount = 0;
 
     // 自定义属性
     private int pointCountMin = 70;
@@ -113,14 +114,15 @@ public class StockChartView extends View {
         } finally {
             a.recycle();
         }
-
-        gestureDetector.setIsLongpressEnabled(true);
     }
 
     /**********************************************************************************************/
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
+
+        mSimpleOnGestureListener.onTouchEvent(e);
+        mSimpleOnScaleGestureListener.onTouchEvent(e);
 
         switch (e.getAction()) {
 
@@ -146,6 +148,8 @@ public class StockChartView extends View {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
 
+                scaleCount = 0;
+                scrollRange = 0;
                 getParent().requestDisallowInterceptTouchEvent(false);
 
                 // 取消高亮
@@ -174,9 +178,6 @@ public class StockChartView extends View {
                 break;
             }
         }
-
-        gestureDetector.onTouchEvent(e);
-        scaleDetector.onTouchEvent(e);
         return true;
     }
 
@@ -339,7 +340,7 @@ public class StockChartView extends View {
         //Log.e("StockChartView", "notifyDataSetChanged");
     }
 
-    private final GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+    private final GestureDetector mSimpleOnGestureListener = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
 
         /**
          * 长按高亮显示
@@ -515,63 +516,116 @@ public class StockChartView extends View {
         }
     });
 
-    private final ScaleGestureDetector scaleDetector = new ScaleGestureDetector(getContext(), new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+    private final ScaleGestureDetector mSimpleOnScaleGestureListener = new ScaleGestureDetector(getContext(), new ScaleGestureDetector.SimpleOnScaleGestureListener() {
 
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
 
-            if (indexMax <= 0 || indexEnd >= indexMax || indexBegin <= 0)
-                return super.onScale(detector);
+            if (indexMax <= 0)
+                return true;
 
-            // K线图才会缩放
-            if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
+            if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
+                return true;
 
-//                final long temp = System.currentTimeMillis();
-//                Log.e("ooooo", "onScale ==> temp = " + temp + ", timestamp = " + timestamp);
-//                if (temp - timestamp <= 15) return super.onScale(detector);
-//                timestamp = temp;
+            scaleCount = scaleCount + 1;
+            if (scaleCount <= 3)
+                return true;
+            scaleCount = 0;
 
-                float f = detector.getScaleFactor();
+            float f = detector.getScaleFactor();
 
-                if (f < 1.0f) {
-                    // Log.e("yt", "onScale ==> 缩小 " + f);
+            if (f < 1.0f) {
+               // Log.e("yt", "onScale ==> 缩小 " + f);
 
-                    final int indexEndTemp = indexEnd + 1;
-                    if (indexEndTemp >= indexMax) return false;
+                // 最右边
+                if (indexEnd >= indexMax) {
 
-                    final int indexBeginTemp = indexBegin - 1;
-                    if (indexBeginTemp <= 0) return false;
+                    final int indexBeginTemp1 = indexBegin - 1;
+                    if (indexBeginTemp1 <= 0) return true;
 
-                    final int indexCountTemp = indexCount + 2;
-                    if (indexCountTemp >= pointCountMax) return false;
+                    final int indexCountTemp1 = indexCount + 2;
+                    if (indexCountTemp1 >= pointCountMax) return true;
 
-                    indexCount = indexCountTemp;
-                    indexBegin = indexBeginTemp;
-                    indexEnd = indexEndTemp;
+                    indexCount = indexCountTemp1;
+                    indexBegin = indexBeginTemp1;
                     getParent().requestDisallowInterceptTouchEvent(true);
                     postInvalidate();
+                }
+                // 最左边
+                else if (indexBegin <= 0) {
+                    final int indexEndTemp2 = indexEnd + 2;
+                    if (indexEndTemp2 >= indexMax) return true;
 
-                } else if (f > 1.0f) {
-                    Log.e("yt", "onScale ==> 放大 " + f);
+                    final int indexCountTemp2 = indexCount + 2;
+                    if (indexCountTemp2 >= pointCountMax) return true;
 
-                    final int indexEndTemp = indexEnd - 1;
-                    if (indexEndTemp >= indexMax) return false;
+                    indexCount = indexCountTemp2;
+                    indexEnd = indexEndTemp2;
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    postInvalidate();
+                } else {
+                    final int indexEndTemp3 = indexEnd + 1;
+                    if (indexEndTemp3 >= indexMax) return true;
 
-                    final int indexBeginTemp = indexBegin + 1;
-                    if (indexBeginTemp <= 0) return false;
+                    final int indexBeginTemp3 = indexBegin - 1;
+                    if (indexBeginTemp3 <= 0) return true;
 
-                    final int indexCountTemp = indexCount - 2;
-                    if (indexCountTemp <= pointCountMin) return false;
+                    final int indexCountTemp3 = indexCount + 2;
+                    if (indexCountTemp3 >= pointCountMax) return true;
 
-                    indexCount = indexCountTemp;
-                    indexBegin = indexBeginTemp;
-                    indexEnd = indexEndTemp;
+                    indexCount = indexCountTemp3;
+                    indexBegin = indexBeginTemp3;
+                    indexEnd = indexEndTemp3;
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    postInvalidate();
+                }
+            } else if (f > 1.0f) {
+               // Log.e("yt", "onScale ==> 放大 " + f);
+
+                // 最右边
+                if (indexEnd >= indexMax) {
+
+                    final int indexBeginTemp4 = indexBegin + 2;
+                    if (indexBeginTemp4 <= 0) return true;
+
+                    final int indexCountTemp4 = indexCount - 2;
+                    if (indexCountTemp4 <= pointCountMin) return true;
+
+                    indexCount = indexCountTemp4;
+                    indexBegin = indexBeginTemp4;
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    postInvalidate();
+                }
+                // 最左边
+                else if (indexBegin <= 0) {
+                    final int indexEndTemp5 = indexEnd + 2;
+                    if (indexEndTemp5 >= indexMax) return true;
+
+                    final int indexCountTemp5 = indexCount - 2;
+                    if (indexCountTemp5 <= pointCountMin) return true;
+
+                    indexCount = indexCountTemp5;
+                    indexEnd = indexEndTemp5;
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    postInvalidate();
+                } else {
+                    final int indexEndTemp6 = indexEnd - 1;
+                    if (indexEndTemp6 >= indexMax) return true;
+
+                    final int indexBeginTemp6 = indexBegin + 1;
+                    if (indexBeginTemp6 <= 0) return true;
+
+                    final int indexCountTemp6 = indexCount - 2;
+                    if (indexCountTemp6 <= pointCountMin) return true;
+
+                    indexCount = indexCountTemp6;
+                    indexBegin = indexBeginTemp6;
+                    indexEnd = indexEndTemp6;
                     getParent().requestDisallowInterceptTouchEvent(true);
                     postInvalidate();
                 }
             }
-
-            return super.onScale(detector);
+            return true;
         }
     });
 

@@ -19,7 +19,7 @@
             android:paddingRight="10dp"
             android:paddingTop="10dp"
             app:scv_board_padding="2dp"
-            app:scv_point_count="26"
+            app:scv_point_count="50"
             app:scv_point_max="70"
             app:scv_point_min="26"
             app:scv_point_space="4dp"
