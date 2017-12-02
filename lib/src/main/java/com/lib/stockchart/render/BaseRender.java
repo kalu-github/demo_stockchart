@@ -26,6 +26,8 @@ public abstract class BaseRender {
     private float xHighligh = -1f;
     private float yHighligh = -1f;
 
+    private float oldPriceMin, oldPriceMax, oldTurnoverMax;
+
     public float getxHighligh() {
         return xHighligh;
     }
@@ -71,6 +73,13 @@ public abstract class BaseRender {
      */
     void calculateData(int indexBegin, int indexEnd, float xlabelHeight, float boardPadding) {
 
+        // 计算效率
+        final float priceMin = EntryManager.getInstance().calculatePriceMin(indexBegin, indexEnd);
+        final float priceMax = EntryManager.getInstance().calculatePriceMax(indexBegin, indexEnd);
+        final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexEnd);
+        if (oldPriceMin == priceMin && oldPriceMax == priceMax && oldTurnoverMax == turnoverMax)
+            return;
+
         final int weightTop = EntryManager.getInstance().getWeightTop();
         final int weightDown = EntryManager.getInstance().getWeightDown();
         final int weightSum = weightTop + weightDown;
@@ -92,6 +101,10 @@ public abstract class BaseRender {
 
         final float realBegin = left + boardPadding;
         final float realEnd = right - boardPadding - pointWidth;
+        float priceSum = priceMax - priceMin;
+
+        final float temp1 = heightSrc / priceSum;
+        final float temp2 = priceMin * temp1;
 
         for (int i = indexBegin; i <= indexEnd; i++) {
 
@@ -107,19 +120,14 @@ public abstract class BaseRender {
                 entry.setxLabelReal(temp);
             }
 
-            // 2.计算真实Y轴坐标
-            final float priceMin = EntryManager.getInstance().calculatePriceMin(indexBegin, indexEnd);
-            final float priceMax = EntryManager.getInstance().calculatePriceMax(indexBegin, indexEnd);
-            final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexEnd);
-            float priceSum = priceMax - priceMin;
             // 价格
-            entry.setOpenReal(bottomSrc - (entry.getOpen() - priceMin) * heightSrc / priceSum);
-            entry.setCloseReal(bottomSrc - (entry.getClose() - priceMin) * heightSrc / priceSum);
-            entry.setHighReal(bottomSrc - (entry.getHigh() - priceMin) * heightSrc / priceSum);
-            entry.setLowReal(bottomSrc - (entry.getLow() - priceMin) * heightSrc / priceSum);
-            entry.setMa5Real(bottomSrc - (entry.getMa5() - priceMin) * heightSrc / priceSum);
-            entry.setMa10Real(bottomSrc - (entry.getMa10() - priceMin) * heightSrc / priceSum);
-            entry.setMa20Real(bottomSrc - (entry.getMa20() - priceMin) * heightSrc / priceSum);
+            entry.setOpenReal(bottomSrc - entry.getOpen() * temp1 + temp2);
+            entry.setCloseReal(bottomSrc - entry.getClose() * temp1 + temp2);
+            entry.setHighReal(bottomSrc - entry.getHigh() * temp1 + temp2);
+            entry.setLowReal(bottomSrc - entry.getLow() * temp1 + temp2);
+            entry.setMa5Real(bottomSrc - entry.getMa5() * temp1 + temp2);
+            entry.setMa10Real(bottomSrc - entry.getMa10() * temp1 + temp2);
+            entry.setMa20Real(bottomSrc - entry.getMa20() * temp1 + temp2);
             // 成交量
             entry.setVolumeReal(bottom - entry.getVolume() * heightBottom / turnoverMax);
             entry.setVolumeMa5Real(bottom - entry.getVolumeMa5() * heightBottom / turnoverMax);
