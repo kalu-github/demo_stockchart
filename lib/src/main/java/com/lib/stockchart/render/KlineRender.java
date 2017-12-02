@@ -18,7 +18,7 @@ import java.util.List;
 public class KlineRender extends BaseRender {
 
     @Override
-    public void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexMax, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding) {
+    public void onCanvas(Canvas canvas, int pointMax, int indexBegin, int indexEnd, int indexMax, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding) {
        // Log.e("KlineRender", "onCanvas");
 
         final List<IDraw> drawList = getDrawList();
@@ -29,16 +29,16 @@ public class KlineRender extends BaseRender {
             }
         } else {
 
-            calculateData(indexBegin, indexEnd, indexCount, xlabelHeight, boardPadding);
-           // Log.e("KlineRender", "onCanvas ==> indexBegin = " + indexBegin + ", indexEnd = " + indexEnd+", indexCount = "+indexCount);
+            calculateData(indexBegin, indexEnd, xlabelHeight, boardPadding);
 
             final float minPrice = EntryManager.getInstance().calculatePriceMin(indexBegin, indexEnd);
             final float maxPrice = EntryManager.getInstance().calculatePriceMax(indexBegin, indexEnd);
             final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexEnd);
 
+            Log.e("KlineRender", "onCanvas ==> pointMax = " + pointMax + ", indexBegin = " + indexBegin+", indexEnd = "+indexEnd);
             for (int i = 0; i < drawList.size(); i++) {
                 final IDraw temp = drawList.get(i);
-                temp.onDrawData(this, canvas, indexCount, indexBegin, indexEnd, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
+                temp.onDrawData(this, canvas, pointMax, indexBegin, indexEnd, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
             }
         }
     }

@@ -39,7 +39,7 @@ public interface IDraw {
      *
      * @param render       着色管理
      * @param canvas       画布
-     * @param indexCount   要显示的个数
+     * @param pointMax     最多显示个数
      * @param indexBegin   x轴起始索引
      * @param indexEnd     x轴结束索引
      * @param minPrice     y轴最低价
@@ -52,5 +52,5 @@ public interface IDraw {
      * @param xlabelHeight K线图, 分时图, x坐标轴文字信息显示区域高度
      * @param boardPadding 边框内边距
      */
-    void onDrawData(BaseRender render, Canvas canvas, int indexCount, int indexBegin, int indexEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding);
+    void onDrawData(BaseRender render, Canvas canvas, int pointMax, int indexBegin, int indexEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding);
 }

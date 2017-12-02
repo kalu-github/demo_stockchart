@@ -54,17 +54,22 @@ public abstract class BaseRender {
         this.bottom = bottom;
         this.width = right - left;
         this.height = bottom - top;
-       // Log.e("BaseRender", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom + ", width = " + width + ", height = " + height);
+        // Log.e("BaseRender", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom + ", width = " + width + ", height = " + height);
 
         for (IDraw drawing : mDrawList) {
-            drawing.onDrawInit(this.left, this.top, this.right, this.bottom, this.width, this.height,xlabelHeight, boardPadding);
+            drawing.onDrawInit(this.left, this.top, this.right, this.bottom, this.width, this.height, xlabelHeight, boardPadding);
         }
     }
 
     /**
      * 计算数据
+     *
+     * @param indexBegin   起始下标索引
+     * @param indexEnd     结束下标索引
+     * @param xlabelHeight x坐标轴显示信息区域高度
+     * @param boardPadding 内边距
      */
-    void calculateData(int indexBegin, int indexEnd, int indexCount, float xlabelHeight, float boardPadding) {
+    void calculateData(int indexBegin, int indexEnd, float xlabelHeight, float boardPadding) {
 
         final int weightTop = EntryManager.getInstance().getWeightTop();
         final int weightDown = EntryManager.getInstance().getWeightDown();
@@ -80,7 +85,7 @@ public abstract class BaseRender {
         // 点与点间隙
         final float pointSpace = EntryManager.getInstance().getPointSpace();
         // 每个点宽度
-        final float pointWidth = (width - 2 * boardPadding - (indexCount - 1) * pointSpace) / indexCount;
+        final float pointWidth = (width - 2 * boardPadding - (indexEnd - indexBegin) * pointSpace) / (indexEnd - indexBegin + 1);
         EntryManager.getInstance().setPointWidth((int) pointWidth);
 
         final List<Entry> entryList = EntryManager.getInstance().getEntryList();
@@ -128,7 +133,19 @@ public abstract class BaseRender {
 
     /**********************************************************************************************/
 
-    public abstract void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexCountMax, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding);
+    /**
+     * @param canvas
+     * @param pointMax      最多显示个数
+     * @param indexBegin    起始下标
+     * @param indexEnd      结束下标
+     * @param indexCountMax 真实数据的个数
+     * @param xoffsetLeft   左侧拖拽位移
+     * @param xoffsetRight  右侧拖拽位移
+     * @param loadingStr    加载信息
+     * @param xlabelHeight  x坐标轴显示信息总高度
+     * @param boardPadding  内边距
+     */
+    public abstract void onCanvas(Canvas canvas, int pointMax, int indexBegin, int indexEnd, int indexCountMax, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding);
 
     public void clearData() {
         mDrawList.clear();

@@ -11,6 +11,7 @@ import com.lib.stockchart.render.BaseRender;
 import com.lib.stockchart.entry.Entry;
 import com.lib.stockchart.entry.EntryManager;
 import com.lib.stockchart.paint.StockPaint;
+import com.lib.stockchart.render.RenderManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,9 @@ public class DrawTurnover implements IDraw {
     private float bottom;
     private float width;
     private float height;
+
+    // 5日均线, 10日均线
+    private float[] pts5, pts10;
 
     @Override
     public void onDrawInit(int left1, int top1, int right1, int bottom1, int width1, int height1, float xlabelHeight, float boardPadding) {
@@ -57,7 +61,7 @@ public class DrawTurnover implements IDraw {
     }
 
     @Override
-    public void onDrawData(BaseRender render, Canvas canvas, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding) {
+    public void onDrawData(BaseRender render, Canvas canvas, int pointMax, int indexBegin, int indexEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding) {
         canvas.save();
 
         // Log.e("DrawTurnover1", "onDrawData ==> minIndex = "+minIndex+", maxIndex = "+maxIndex+", minPrice = "+minPrice+", maxPrice = "+maxPrice+", maxTurnover = "+maxTurnover);
@@ -71,7 +75,7 @@ public class DrawTurnover implements IDraw {
         // 2.设置画笔颜色
         StockPaint.setPaintWidth(5);
         // 2.循环遍历
-        for (int i = pointBegin; i <= pointEnd; i++) {
+        for (int i = indexBegin; i <= indexEnd; i++) {
 
             // 当前点的数据
             Entry entry = entryManager.getEntryList().get(i);
@@ -117,7 +121,7 @@ public class DrawTurnover implements IDraw {
             canvas.drawRect(left, isMin ? (bottom - boardPadding) : top, right, bottom, StockPaint.getTurnoverPaint());
         }
 
-        drawMadline(canvas, pointCount, pointBegin, pointEnd, xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
+        drawMadline(canvas, pointMax, indexBegin, indexEnd, xoffsetLeft, xoffsetRight);
 
         // 文字交易量
         Paint textPaint = StockPaint.getTextPaint(Paint.Align.LEFT, 20);
@@ -126,7 +130,7 @@ public class DrawTurnover implements IDraw {
         canvas.drawText(maxTurnover + "手", left, top + temp, textPaint);
 
         // 高亮坐标
-        drawHightlight(canvas, xHighligh, yHighligh, pointCount, pointBegin, pointEnd, xlabelHeight, boardPadding);
+        drawHightlight(canvas, xHighligh, yHighligh, indexBegin, indexEnd, boardPadding);
 
         // 保存
         canvas.restore();
@@ -190,7 +194,7 @@ public class DrawTurnover implements IDraw {
     /**
      * 高亮
      */
-    private void drawHightlight(Canvas canvas, float xHighligh, float yHighligh, int pointCount, int pointBegin, int pointEnd, float xlabelHeight, float boardPadding) {
+    private void drawHightlight(Canvas canvas, float xHighligh, float yHighligh, int pointBegin, int pointEnd, float boardPadding) {
 
         if (xHighligh == -1f || yHighligh == -1f) return;
 
@@ -242,24 +246,26 @@ public class DrawTurnover implements IDraw {
     /**
      * MAD
      */
-    private void drawMadline(Canvas canvas, int pointCount, int pointBegin, int pointEnd, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding) {
+    private void drawMadline(Canvas canvas, int pointMax, int pointBegin, int pointEnd, float xoffsetLeft, float xoffsetRight) {
+
+        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
+            return;
 
         final List<Entry> entryList = EntryManager.getInstance().getEntryList();
-        final float pointWidth = EntryManager.getInstance().getPointWidth();
+        final int pointWidth = EntryManager.getInstance().getPointWidth();
 
-        // 5日均线
-        final float[] pts5 = new float[(pointCount + 1) * 4];
-        // 10日均线
-        final float[] pts10 = new float[(pointCount + 1) * 4];
+        if (null == pts5 && null == pts10) {
+            final int size = 4 * (pointMax + 1);
+            pts5 = new float[size];
+            pts10 = new float[size];
+        }
 
         for (int i = pointBegin; i <= pointEnd; i++) {
-
             final Entry entry = entryList.get(i);
-
-            final float x = entry.getxLabelReal() + pointWidth / 2 + xoffsetLeft + xoffsetRight;
+            final float tempx = entry.getxLabelReal();
+            final float x = tempx + pointWidth / 2 + xoffsetLeft + xoffsetRight;
             final float y1 = entry.getVolumeMa5Real();
             final float y2 = entry.getVolumeMa10Real();
-            // Log.e("uuuu", "i = " + (i - 1) + ", x = " + x + ", y1 = " + y1 + ", y2 = " + y2);
 
             final int tempi = i - pointBegin;
             if (i == pointBegin) {
@@ -280,6 +286,26 @@ public class DrawTurnover implements IDraw {
                 pts10[4 * tempi + 1] = pts10[4 * (tempi - 1) + 3];
                 pts10[4 * tempi + 2] = x;
                 pts10[4 * tempi + 3] = y2;
+            }
+        }
+
+        // 容错处理
+        if (pointBegin + pointMax > pointEnd) {
+            int realEnd = (pointEnd - pointBegin);
+            final float x5 = pts5[4 * realEnd + 2];
+            final float y5 = pts5[4 * realEnd + 3];
+            final float x10 = pts10[4 * realEnd + 2];
+            final float y10 = pts10[4 * realEnd + 3];
+
+            for (int i = realEnd + 1; i <= pointMax; i++) {
+                pts5[4 * i + 0] = x5;
+                pts5[4 * i + 1] = y5;
+                pts5[4 * i + 2] = x5;
+                pts5[4 * i + 3] = y5;
+                pts10[4 * i + 0] = x10;
+                pts10[4 * i + 1] = y10;
+                pts10[4 * i + 2] = x10;
+                pts10[4 * i + 3] = y10;
             }
         }
 

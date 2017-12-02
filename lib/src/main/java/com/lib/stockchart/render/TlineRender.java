@@ -17,7 +17,7 @@ import java.util.List;
 public class TlineRender extends BaseRender {
 
     @Override
-    public void onCanvas(Canvas canvas, int indexBegin, int indexEnd, int indexCount, int indexMax, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding) {
+    public void onCanvas(Canvas canvas, int pointMax, int indexBegin, int indexEnd, int indexMax, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding) {
 
         final List<IDraw> drawList = getDrawList();
 
@@ -32,11 +32,11 @@ public class TlineRender extends BaseRender {
             final float minPrice = EntryManager.getInstance().calculatePriceMin(indexBegin, indexMax);
             final float maxPrice = EntryManager.getInstance().calculatePriceMax(indexBegin, indexMax);
             final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexMax);
-            calculateData(indexBegin, indexMax, indexMax, xlabelHeight, boardPadding);
+            calculateData(indexBegin, indexMax, xlabelHeight, boardPadding);
 
             for (int i = 0; i < drawList.size(); i++) {
                 final IDraw temp = drawList.get(i);
-                temp.onDrawData(this, canvas, indexMax, 0, indexMax, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
+                temp.onDrawData(this, canvas, pointMax, 0, indexMax, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
             }
         }
     }

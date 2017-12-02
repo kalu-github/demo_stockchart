@@ -41,8 +41,8 @@ public class StockChartView extends View {
     private float scaleCount = 0; // 缩放次数
 
     // 自定义属性
-    private int pointCountMin = 70;
-    private int pointCountMax = 26;
+    private int pointMin = 26;  // 最少显示个数
+    private int pointMax = 70;  // 最多显示个数
     private float xoffsetLeft = 0f;
     private float xoffsetRight = 0f;
     private float xoffsetMax = 100f;
@@ -83,8 +83,8 @@ public class StockChartView extends View {
         try {
 
             indexCount = a.getInt(R.styleable.StockChartView_scv_point_count, 50);
-            pointCountMax = a.getInt(R.styleable.StockChartView_scv_point_max, 75);
-            pointCountMin = a.getInt(R.styleable.StockChartView_scv_point_min, 25);
+            pointMax = a.getInt(R.styleable.StockChartView_scv_point_max, 75);
+            pointMin = a.getInt(R.styleable.StockChartView_scv_point_min, 25);
             xoffsetMax = a.getDimension(R.styleable.StockChartView_scv_xoffset_max, 100f);
             final String tempStr = a.getString(R.styleable.StockChartView_scv_hint_load);
             loadingStr = TextUtils.isEmpty(tempStr) ? "正在加载信息" : tempStr;
@@ -181,7 +181,7 @@ public class StockChartView extends View {
         if (model == RenderManager.MODEL_TLINE_TURNOVER) {
             RenderManager.getInstance().getTlineRender().onCanvas(canvas, 0, indexMax, indexMax, indexMax, 0, 0, loadingStr, xlabelHeight, boardPadding);
         } else if (model == RenderManager.MODEL_KLINE_TURNOVER) {
-            RenderManager.getInstance().getKlineRender().onCanvas(canvas, indexBegin, indexEnd, indexCount, indexMax, xoffsetLeft, xoffsetRight, loadingStr, xlabelHeight, boardPadding);
+            RenderManager.getInstance().getKlineRender().onCanvas(canvas, pointMax, indexBegin, indexEnd, indexMax, xoffsetLeft, xoffsetRight, loadingStr, xlabelHeight, boardPadding);
         }
     }
 
@@ -528,7 +528,7 @@ public class StockChartView extends View {
                     if (indexBeginTemp1 <= 0) return true;
 
                     final int indexCountTemp1 = indexCount + 2;
-                    if (indexCountTemp1 >= pointCountMax) return true;
+                    if (indexCountTemp1 >= pointMax) return true;
 
                     indexCount = indexCountTemp1;
                     indexBegin = indexBeginTemp1;
@@ -541,7 +541,7 @@ public class StockChartView extends View {
                     if (indexEndTemp2 >= indexMax) return true;
 
                     final int indexCountTemp2 = indexCount + 2;
-                    if (indexCountTemp2 >= pointCountMax) return true;
+                    if (indexCountTemp2 >= pointMax) return true;
 
                     indexCount = indexCountTemp2;
                     indexEnd = indexEndTemp2;
@@ -555,7 +555,7 @@ public class StockChartView extends View {
                     if (indexBeginTemp3 <= 0) return true;
 
                     final int indexCountTemp3 = indexCount + 2;
-                    if (indexCountTemp3 >= pointCountMax) return true;
+                    if (indexCountTemp3 >= pointMax) return true;
 
                     indexCount = indexCountTemp3;
                     indexBegin = indexBeginTemp3;
@@ -573,7 +573,7 @@ public class StockChartView extends View {
                     if (indexBeginTemp4 <= 0) return true;
 
                     final int indexCountTemp4 = indexCount - 2;
-                    if (indexCountTemp4 <= pointCountMin) return true;
+                    if (indexCountTemp4 <= pointMin) return true;
 
                     indexCount = indexCountTemp4;
                     indexBegin = indexBeginTemp4;
@@ -586,7 +586,7 @@ public class StockChartView extends View {
                     if (indexEndTemp5 >= indexMax) return true;
 
                     final int indexCountTemp5 = indexCount - 2;
-                    if (indexCountTemp5 <= pointCountMin) return true;
+                    if (indexCountTemp5 <= pointMin) return true;
 
                     indexCount = indexCountTemp5;
                     indexEnd = indexEndTemp5;
@@ -600,7 +600,7 @@ public class StockChartView extends View {
                     if (indexBeginTemp6 <= 0) return true;
 
                     final int indexCountTemp6 = indexCount - 2;
-                    if (indexCountTemp6 <= pointCountMin) return true;
+                    if (indexCountTemp6 <= pointMin) return true;
 
                     indexCount = indexCountTemp6;
                     indexBegin = indexBeginTemp6;
