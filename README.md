@@ -61,13 +61,22 @@ StockChartView.addDataSetChanged(List<Entey>);
 StockChartView.clearDataSetChanged();
 3.监听
 StockChartView.setOnStockChartChangeListener(new OnStockChartChangeListener() {
-                        @Override
+
+                        # 暂时无效果
+                        @Override
                         public void onLeftRefresh() {
                             
                         }
 
+                        # 暂时无效果
                         @Override
                         public void onRightRefresh() {
+
+                        }
+                        
+                        # 暂时无效果
+                        @Override
+                        public void onHighlight(Entry entry, int entryIndex, float x, float y) {
 
                         }
 
@@ -78,11 +87,6 @@ StockChartView.setOnStockChartChangeListener(new OnStockChartChangeListener() {
 
                         @Override
                         public void onDoubleTap(MotionEvent e, float x, float y) {
-
-                        }
-
-                        @Override
-                        public void onHighlight(Entry entry, int entryIndex, float x, float y) {
 
                         }
 });
