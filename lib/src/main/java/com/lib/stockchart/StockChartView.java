@@ -373,7 +373,7 @@ public class StockChartView extends View {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
 
-            if (indexMax == 0 || Math.abs(distanceY) > Math.abs(distanceX) || e1.getPointerCount() != 1 || e2.getPointerCount() != 1)
+            if (isLongPress || indexMax == 0 || Math.abs(distanceY) > Math.abs(distanceX) || e1.getPointerCount() != 1 || e2.getPointerCount() != 1)
                 return false;
             //  Log.e("kaluyyyy", "onScroll ==> distanceX = " + distanceX);
 
@@ -505,7 +505,7 @@ public class StockChartView extends View {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
 
-            if (indexMax <= 0)
+            if (isLongPress || indexMax <= 0)
                 return true;
 
             if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)

@@ -27,16 +27,16 @@ public class TlineRender extends BaseRender {
                 drawing.onDrawNull(canvas, loadingStr, xlabelHeight, boardPadding);
             }
         } else {
-           // Log.e("TlineRender", "onCanvas ==> 有数据");
+            // Log.e("TlineRender", "onCanvas ==> 有数据");
 
             final float minPrice = EntryManager.getInstance().calculatePriceMin(indexBegin, indexMax);
             final float maxPrice = EntryManager.getInstance().calculatePriceMax(indexBegin, indexMax);
             final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexMax);
-            calculateData(indexBegin, indexMax, xlabelHeight, boardPadding);
+            calculateData(0, indexMax, xlabelHeight, boardPadding);
 
             for (int i = 0; i < drawList.size(); i++) {
                 final IDraw temp = drawList.get(i);
-                temp.onDrawData(this, canvas, pointMax, 0, indexMax, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
+                temp.onDrawData(this, canvas, indexMax, 0, indexMax, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
             }
         }
     }

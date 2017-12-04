@@ -56,8 +56,6 @@ public class DrawKline implements IDraw {
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
             return;
 
-        //  Log.e("DrawKline", "onDrawNull ==> str = " + str + ", xlabelHeight = " + xlabelHeight + ", boardPadding = " + boardPadding);
-
         canvas.save();
         drawBackground(canvas, str, boardPadding);
         canvas.restore();
@@ -68,76 +66,75 @@ public class DrawKline implements IDraw {
 
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
             return;
-        //  Log.e("DrawKline", "onDrawData ==>");
+
+        final List<Entry> entryList = EntryManager.getInstance().getEntryList();
+        if (null == entryList || entryList.size() <= 0) return;
 
         canvas.save();
         // canvas.clipRect(left, top, right, bottom);
 
-        final List<Entry> entryList = EntryManager.getInstance().getEntryList();
         final int pointWidth = EntryManager.getInstance().getPointWidth();
 
         // 边框
         drawBackground(canvas, null, boardPadding);
 
+        final Entry entryBegin = entryList.get(0);
+        final Entry entryEnd = entryList.get(entryList.size() - 1);
+
         for (int i = indexBegin; i <= indexEnd; i++) {
 
             final Entry entry = entryList.get(i);
+            if (null == entry) continue;
 
-            // X轴, 需要循环
-            drawXlabel(canvas, i, indexBegin, indexEnd, boardPadding);
-            // 2.K线, 需要循环
+            // X轴
+            drawXlabel(canvas, entry, i, indexBegin, indexEnd, boardPadding);
+            // K线
             drawKline(canvas, entry, pointWidth, xoffsetLeft, xoffsetRight);
-            // 3.mad, 需要循环
-            drawMadline(canvas, entry, i, pointMax, indexBegin, indexEnd, xoffsetLeft, xoffsetRight);
-            // 高亮坐标, 需要循环
-            drawHightlight(canvas, entryList, pointWidth, i, xHighligh, yHighligh, indexBegin, indexEnd, boardPadding);
+            // mad
+            drawMadline(canvas, entry, i, pointWidth, pointMax, indexBegin, indexEnd, xoffsetLeft, xoffsetRight);
+            // 高亮
+            drawHightlight(canvas, entryBegin, entryEnd, i == 0 ? entry : entryList.get(i - 1), entry, pointWidth, i, xHighligh, yHighligh, indexBegin, indexEnd, boardPadding);
         }
 
-        // 4.价格
+        // 价格
         drawPrice(canvas, minPrice, maxPrice);
+
         canvas.restore();
     }
 
     /**
      * 高亮
      */
-    private void drawHightlight(Canvas canvas, List<Entry> entryList, int pointWidth, int i, float xHighligh, float yHighligh, int pointBegin, int pointEnd, float boardPadding) {
-
-        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
-            return;
+    private void drawHightlight(Canvas canvas, Entry entryBegin, Entry entryEnd, Entry entryLast, Entry entry, int pointWidth, int i, float xHighligh, float yHighligh, int pointBegin, int pointEnd, float boardPadding) {
 
         if (xHighligh == -1f || yHighligh == -1f) return;
 
-        final Entry entryBegin = entryList.get(pointBegin);
         final float xBegin = entryBegin.getxLabelReal() + pointWidth / 2;
 
-        final Entry entryEnd = entryList.get(pointEnd);
         final float xEnd = entryEnd.getxLabelReal() + pointWidth / 2;
 
         if (i == pointBegin && xHighligh <= xBegin) {
             // 横线
-            final float y = entryList.get(pointBegin).getOpenReal();
+            final float y = entryBegin.getOpenReal();
             canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
             // 竖线
             final float x = boardPadding + left + pointWidth / 2;
             canvas.drawLine(x, top, x, bottom, StockPaint.getLinePaint(Color.BLACK));
         } else if (i == pointBegin && xHighligh >= xEnd) {
             // 横线
-            final float y = entryList.get(pointEnd).getOpenReal();
+            final float y = entryEnd.getOpenReal();
             canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
             // 竖线
             canvas.drawLine(xEnd, top, xEnd, bottom, StockPaint.getLinePaint(Color.BLACK));
         } else {
-            final Entry entry1 = entryList.get(i - 1);
-            final float tempx1 = entry1.getxLabelReal();
+            final float tempx1 = entryLast.getxLabelReal();
             final float x1 = tempx1 + pointWidth / 2;
 
-            final Entry entry2 = entryList.get(i);
-            final float tempx2 = entry2.getxLabelReal();
+            final float tempx2 = entry.getxLabelReal();
             final float x2 = tempx2 + pointWidth / 2;
             if (xHighligh > x1 && xHighligh < x2) {
                 // 横线
-                final float y = entryList.get(i).getOpenReal();
+                final float y = entry.getOpenReal();
                 canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
                 // 竖线
                 canvas.drawLine(x1, top, x1, bottom, StockPaint.getLinePaint(Color.BLACK));
@@ -150,20 +147,16 @@ public class DrawKline implements IDraw {
      */
     private void drawBackground(Canvas canvas, String str, float boardPadding) {
 
-        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
-            return;
-        //  Log.e("DrawKline", "drawBackground ==>");
-
         // X轴显示区域高度
         final float boardTemp = 2 * boardPadding;
         canvas.drawRect(left - boardTemp, top - boardTemp, right + boardTemp, bottom + boardTemp, StockPaint.getBorderPaint(3));
 
         // 4条横线 - 虚线
-        float temp = height / 5;
+        float temp = height / 4;
         final float x1 = left + 2;
         final float x2 = x1 + 5;
 
-        for (int j = 1; j < 5; j++) {
+        for (int j = 1; j < 4; j++) {
 
             float Y = top + j * temp;
             float[] ptsDash = new float[]{x1, 0, x2, 0};
@@ -180,11 +173,11 @@ public class DrawKline implements IDraw {
         }
 
         // 4条竖线 - 虚线
-        float temp2 = width / 5;
+        float temp2 = width / 4;
         final float y1 = top + 2;
         final float y2 = top + 5;
 
-        for (int j = 1; j < 5; j++) {
+        for (int j = 1; j < 4; j++) {
 
             float X = left + j * temp2;
             float[] ptsDash = new float[]{0, y1, 0, y2};
@@ -208,43 +201,38 @@ public class DrawKline implements IDraw {
     /**
      * 画X轴坐标
      */
-    private void drawXlabel(Canvas canvas, int i, int indexBegin, int indexEnd, float boardPadding) {
-        List<Entry> entryList = EntryManager.getInstance().getEntryList();
+    private void drawXlabel(Canvas canvas, Entry entry, int i, int indexBegin, int indexEnd, float boardPadding) {
 
         final Paint.FontMetrics fontMetrics = StockPaint.getTextPaint(Paint.Align.LEFT, 20).getFontMetrics();
         final float fontHeight = fontMetrics.bottom - fontMetrics.top;
         float y = bottom + fontHeight * 4 / 3;
 
-        final int spet = (indexEnd - indexBegin + 1) / 5;
+        final int spet = (indexEnd - indexBegin + 1) / 4;
+
         // 第1个
         if (i == indexBegin) {
-            String xLabelMin = entryList.get(i).getXLabel();
+            String xLabelMin = entry.getXLabel();
             canvas.drawText(xLabelMin, left - boardPadding, y, StockPaint.getTextPaint(Paint.Align.LEFT, 20));
         }
         // 第6个
         else if (i == indexEnd) {
-            String xLabelMax = entryList.get(i).getXLabel();
+            String xLabelMax = entry.getXLabel();
             canvas.drawText(xLabelMax, right + boardPadding, y, StockPaint.getTextPaint(Paint.Align.RIGHT, 20));
         }
         // 第2个
         else if (indexBegin + spet == i) {
-            String xLabel = entryList.get(i).getXLabel();
-            canvas.drawText(xLabel, left + width / 5, y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
+            String xLabel = entry.getXLabel();
+            canvas.drawText(xLabel, left + width / 4, y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
         }
         // 第3个
         else if (indexBegin + 2 * spet == i) {
-            String xLabel = entryList.get(i).getXLabel();
-            canvas.drawText(xLabel, left + 2 * (width / 5), y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
+            String xLabel = entry.getXLabel();
+            canvas.drawText(xLabel, left + 2 * (width / 4), y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
         }
         // 第4个
         else if (indexBegin + 3 * spet == i) {
-            String xLabel = entryList.get(i).getXLabel();
-            canvas.drawText(xLabel, left + 3 * (width / 5), y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
-        }
-        // 第5个
-        else if (indexBegin + 4 * spet == i) {
-            String xLabel = entryList.get(i).getXLabel();
-            canvas.drawText(xLabel, left + 4 * (width / 5), y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
+            String xLabel = entry.getXLabel();
+            canvas.drawText(xLabel, left + 3 * (width / 4), y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
         }
     }
 
@@ -252,9 +240,6 @@ public class DrawKline implements IDraw {
      * 蜡烛图
      */
     private void drawKline(Canvas canvas, Entry entry, int pointWidth, float xoffsetLeft, float xoffsetRight) {
-
-        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
-            return;
 
         // 画笔宽度
         StockPaint.setPaintWidth(5);
@@ -286,12 +271,7 @@ public class DrawKline implements IDraw {
     /**
      * MAD
      */
-    private void drawMadline(Canvas canvas, Entry entry, int j, int pointMax, int pointBegin, int pointEnd, float xoffsetLeft, float xoffsetRight) {
-
-        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
-            return;
-
-        final int pointWidth = EntryManager.getInstance().getPointWidth();
+    private void drawMadline(Canvas canvas, Entry entry, int j, int pointWidth, int pointMax, int pointBegin, int pointEnd, float xoffsetLeft, float xoffsetRight) {
 
         if (null == pts5 && null == pts10 && null == pts20) {
             final int size = 4 * (pointMax + 1);
@@ -371,9 +351,6 @@ public class DrawKline implements IDraw {
      * 价格
      */
     private void drawPrice(Canvas canvas, float minPrice, float maxPrice) {
-
-        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER)
-            return;
 
         Paint textPaint = StockPaint.getTextPaint(Paint.Align.LEFT, 20);
         // 最高价

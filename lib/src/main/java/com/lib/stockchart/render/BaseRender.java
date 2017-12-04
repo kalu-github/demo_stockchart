@@ -73,12 +73,13 @@ public abstract class BaseRender {
      */
     void calculateData(int indexBegin, int indexEnd, float xlabelHeight, float boardPadding) {
 
-        // 计算效率
+        // TODO: 2017/12/3  
+        // todo计算效率, 有BUG当移动时是旧数据
         final float priceMin = EntryManager.getInstance().calculatePriceMin(indexBegin, indexEnd);
         final float priceMax = EntryManager.getInstance().calculatePriceMax(indexBegin, indexEnd);
         final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexEnd);
-        if (oldPriceMin == priceMin && oldPriceMax == priceMax && oldTurnoverMax == turnoverMax)
-            return;
+//        if (oldPriceMin == priceMin && oldPriceMax == priceMax && oldTurnoverMax == turnoverMax)
+//            return;
 
         final int weightTop = EntryManager.getInstance().getWeightTop();
         final int weightDown = EntryManager.getInstance().getWeightDown();

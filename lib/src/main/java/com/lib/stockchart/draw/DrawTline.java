@@ -28,6 +28,9 @@ public class DrawTline implements IDraw {
     private float width;
     private float height;
 
+    // 5日均线, 10日均线, 20日均线
+    private float[] pts5, pts10, pts20;
+
     @Override
     public void onDrawInit(int left1, int top1, int right1, int bottom1, int width1, int height1, float xlabelHeight, float boardPadding) {
 
@@ -54,29 +57,46 @@ public class DrawTline implements IDraw {
             return;
 
         canvas.save();
-        // canvas.clipRect(left, top, right, bottom);
-        drawBackground(canvas, -1, -1, -1, str, boardPadding);
+        drawBackground(canvas, str, boardPadding);
         canvas.restore();
     }
 
     @Override
-    public void onDrawData(BaseRender render, Canvas canvas, int pointCount, int pointBegin, int pointEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding) {
+    public void onDrawData(BaseRender render, Canvas canvas, int pointMax, int indexBegin, int indexEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding) {
         //  Log.e("DrawKline", "onDrawData ==> pointSum = " + pointSum + ", pointBegin = " + pointBegin + ", pointEnd = " + pointEnd + ", minPrice = " + minPrice + ", maxPrice = " + maxPrice + ", maxTurnover = " + maxTurnover);
 
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER)
             return;
 
+        final List<Entry> entryList = EntryManager.getInstance().getEntryList();
+        if (null == entryList || entryList.size() <= 0) return;
+
         canvas.save();
         // canvas.clipRect(left, top, right, bottom);
 
-        // 1.边框
-        drawBackground(canvas, pointCount, pointBegin, pointEnd, null, boardPadding);
-        // 3.mad
-        drawMadline(canvas, pointCount, pointBegin, pointEnd, xoffsetLeft, xoffsetRight);
-        // 4.价格
+        final int pointWidth = EntryManager.getInstance().getPointWidth();
+
+        // 边框
+        drawBackground(canvas, null, boardPadding);
+        // X轴
+        drawXlabel(canvas, boardPadding);
+
+        final Entry entryBegin = entryList.get(0);
+        final Entry entryEnd = entryList.get(entryList.size() - 1);
+
+        for (int i = indexBegin; i <= indexEnd; i++) {
+
+            final Entry entry = entryList.get(i);
+            if (null == entry) continue;
+
+            // mad
+            drawMadline(canvas, entry, i, pointWidth, indexBegin, indexEnd, xoffsetLeft, xoffsetRight);
+            // 高亮
+            drawHightlight(canvas, entryBegin, entryEnd, i == 0 ? entry : entryList.get(i - 1), entry, pointWidth, i, xHighligh, yHighligh, indexBegin, indexEnd, boardPadding);
+        }
+
+        // 价格
         drawPrice(canvas, minPrice, maxPrice);
-        // 高亮坐标
-        drawHightlight(canvas, xHighligh, yHighligh, pointBegin, pointEnd, boardPadding);
 
         canvas.restore();
     }
@@ -84,76 +104,74 @@ public class DrawTline implements IDraw {
     /**
      * 高亮
      */
-    private void drawHightlight(Canvas canvas, float xHighligh, float yHighligh, int pointBegin, int pointEnd, float boardPadding) {
-
-        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER)
-            return;
+    private void drawHightlight(Canvas canvas, Entry entryBegin, Entry entryEnd, Entry entryLast, Entry entry, int pointWidth, int i, float xHighligh, float yHighligh, int pointBegin, int pointEnd, float boardPadding) {
 
         if (xHighligh == -1f || yHighligh == -1f) return;
 
-        final List<Entry> entryList = EntryManager.getInstance().getEntryList();
-        final int pointWidth = EntryManager.getInstance().getPointWidth();
-
-        final Entry entryBegin = entryList.get(pointBegin);
         final float xBegin = entryBegin.getxLabelReal() + pointWidth / 2;
 
-        final Entry entryEnd = entryList.get(pointEnd);
         final float xEnd = entryEnd.getxLabelReal() + pointWidth / 2;
 
-        if (xHighligh <= xBegin) {
+        if (i == pointBegin && xHighligh <= xBegin) {
             // 横线
-            final float y = entryList.get(pointBegin).getOpenReal();
+            final float y = entryBegin.getOpenReal();
             canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
             // 竖线
             final float x = boardPadding + left + pointWidth / 2;
             canvas.drawLine(x, top, x, bottom, StockPaint.getLinePaint(Color.BLACK));
-        } else if (xHighligh >= xEnd) {
+        } else if (i == pointBegin && xHighligh >= xEnd) {
             // 横线
-            final float y = entryList.get(pointEnd).getOpenReal();
+            final float y = entryEnd.getOpenReal();
             canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
             // 竖线
             canvas.drawLine(xEnd, top, xEnd, bottom, StockPaint.getLinePaint(Color.BLACK));
         } else {
-            for (int i = pointBegin; i <= pointEnd; i++) {
+            final float tempx1 = entryLast.getxLabelReal();
+            final float x1 = tempx1 + pointWidth / 2;
 
-                final Entry entry1 = entryList.get(i);
-                final float tempx1 = entry1.getxLabelReal();
-                final float x1 = tempx1 + pointWidth / 2;
-
-                final Entry entry2 = entryList.get(i + 1);
-                final float tempx2 = entry2.getxLabelReal();
-                final float x2 = tempx2 + pointWidth / 2;
-
-                if (xHighligh > x1 && xHighligh < x2) {
-                    // 横线
-                    final float y = entryList.get(i).getOpenReal();
-                    canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
-                    // 竖线
-                    canvas.drawLine(x1, top, x1, bottom, StockPaint.getLinePaint(Color.BLACK));
-                    break;
-                }
+            final float tempx2 = entry.getxLabelReal();
+            final float x2 = tempx2 + pointWidth / 2;
+            if (xHighligh > x1 && xHighligh < x2) {
+                // 横线
+                final float y = entry.getOpenReal();
+                canvas.drawLine(left, y, right, y, StockPaint.getLinePaint(Color.BLACK));
+                // 竖线
+                canvas.drawLine(x1, top, x1, bottom, StockPaint.getLinePaint(Color.BLACK));
             }
         }
     }
 
     /**
+     * 画X轴坐标
+     */
+    private void drawXlabel(Canvas canvas, float boardPadding) {
+
+        final Paint.FontMetrics fontMetrics = StockPaint.getTextPaint(Paint.Align.LEFT, 20).getFontMetrics();
+        final float fontHeight = fontMetrics.bottom - fontMetrics.top;
+        float y = bottom + fontHeight * 4 / 3;
+
+        canvas.drawText("9:00", left - boardPadding, y, StockPaint.getTextPaint(Paint.Align.LEFT, 20));
+        canvas.drawText("10:30", left + width / 4, y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
+        canvas.drawText("11:30/13:00", left + 2 * (width / 4), y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
+        canvas.drawText("14:00", left + 3 * (width / 4), y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
+        canvas.drawText("15:00", right + boardPadding, y, StockPaint.getTextPaint(Paint.Align.RIGHT, 20));
+    }
+
+    /**
      * 背景
      */
-    private void drawBackground(Canvas canvas, int entryCount, int entryBegin, int entryEnd, String str, float boardPadding) {
-
-        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER)
-            return;
+    private void drawBackground(Canvas canvas, String str, float boardPadding) {
 
         // X轴显示区域高度
         final float boardTemp = 2 * boardPadding;
         canvas.drawRect(left - boardTemp, top - boardTemp, right + boardTemp, bottom + boardTemp, StockPaint.getBorderPaint(3));
 
         // 4条横线 - 虚线
-        float temp = height / 5;
+        float temp = height / 4;
         final float x1 = left + 2;
         final float x2 = x1 + 5;
 
-        for (int j = 1; j < 5; j++) {
+        for (int j = 1; j < 4; j++) {
 
             float Y = top + j * temp;
             float[] ptsDash = new float[]{x1, 0, x2, 0};
@@ -170,11 +188,11 @@ public class DrawTline implements IDraw {
         }
 
         // 4条竖线 - 虚线
-        float temp2 = width / 5;
+        float temp2 = width / 4;
         final float y1 = top + 2;
         final float y2 = top + 5;
 
-        for (int j = 1; j < 5; j++) {
+        for (int j = 1; j < 4; j++) {
 
             float X = left + j * temp2;
             float[] ptsDash = new float[]{0, y1, 0, y2};
@@ -190,113 +208,60 @@ public class DrawTline implements IDraw {
             }
         }
 
-        if (!TextUtils.isEmpty(str)) {
-            // 文字交易量
-            canvas.drawText(str, right - width / 2, bottom - height / 2, StockPaint.getTextPaint(Paint.Align.CENTER, 30));
-        } else {
-
-            List<Entry> entryList = EntryManager.getInstance().getEntryList();
-
-            final Paint.FontMetrics fontMetrics = StockPaint.getTextPaint(Paint.Align.LEFT, 20).getFontMetrics();
-            final float fontHeight = fontMetrics.bottom - fontMetrics.top;
-            float y = bottom + fontHeight * 4 / 3;
-
-            final int spet = entryCount / 5;
-            for (int i = entryBegin; i <= entryEnd; i++) {
-
-                // 第1个
-                if (i == entryBegin) {
-                    String xLabelMin = entryList.get(i).getXLabel();
-                    canvas.drawText(xLabelMin, left - boardPadding, y, StockPaint.getTextPaint(Paint.Align.LEFT, 20));
-                }
-                // 第6个
-                else if (i == entryEnd) {
-                    String xLabelMax = entryList.get(i).getXLabel();
-                    canvas.drawText(xLabelMax, right + boardPadding, y, StockPaint.getTextPaint(Paint.Align.RIGHT, 20));
-                }
-                // 第2个
-                else if (entryBegin + spet == i) {
-                    String xLabel = entryList.get(i).getXLabel();
-                    canvas.drawText(xLabel, left + width / 5, y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
-                }
-                // 第3个
-                else if (entryBegin + 2 * spet == i) {
-                    String xLabel = entryList.get(i).getXLabel();
-                    canvas.drawText(xLabel, left + 2 * (width / 5), y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
-                }
-                // 第4个
-                else if (entryBegin + 3 * spet == i) {
-                    String xLabel = entryList.get(i).getXLabel();
-                    canvas.drawText(xLabel, left + 3 * (width / 5), y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
-                }
-                // 第5个
-                else if (entryBegin + 4 * spet == i) {
-                    String xLabel = entryList.get(i).getXLabel();
-                    canvas.drawText(xLabel, left + 4 * (width / 5), y, StockPaint.getTextPaint(Paint.Align.CENTER, 20));
-                }
-            }
-        }
+        if (TextUtils.isEmpty(str)) return;
+        // 文字交易量
+        canvas.drawText(str, right - width / 2, bottom - height / 2, StockPaint.getTextPaint(Paint.Align.CENTER, 30));
     }
 
     /**
      * MAD
      */
-    private void drawMadline(Canvas canvas, int pointCount, int pointBegin, int pointEnd, float xoffsetLeft, float xoffsetRight) {
+    private void drawMadline(Canvas canvas, Entry entry, int j, int pointWidth, int indexBegin, int indexEnd, float xoffsetLeft, float xoffsetRight) {
 
-        if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER)
-            return;
-
-        final List<Entry> entryList = EntryManager.getInstance().getEntryList();
-        final int pointWidth = EntryManager.getInstance().getPointWidth();
-
-        // 5日均线
-        final float[] pts5 = new float[(pointCount + 1) * 4];
-        // 10日均线
-        final float[] pts10 = new float[(pointCount + 1) * 4];
-        // 20日均线
-        final float[] pts20 = new float[(pointCount + 1) * 4];
-
-        for (int i = pointBegin; i <= pointEnd; i++) {
-
-            final Entry entry = entryList.get(i);
-
-            final float tempx = entry.getxLabelReal();
-            final float x = tempx + pointWidth / 2 + xoffsetLeft + xoffsetRight;
-            final float y1 = entry.getMa5Real();
-            final float y2 = entry.getMa10Real();
-            final float y3 = entry.getMa20Real();
-            //  Log.e("lll", "i = " + (i - 1) + ", x = " + x + ", y1 = " + y1 + ", y2 = " + y2 + ", y3 = " + y3);
-
-            final int tempi = i - pointBegin;
-            if (i == pointBegin) {
-                pts5[4 * tempi + 0] = x;
-                pts5[4 * tempi + 1] = y1;
-                pts5[4 * tempi + 2] = x;
-                pts5[4 * tempi + 3] = y1;
-                pts10[4 * tempi + 0] = x;
-                pts10[4 * tempi + 1] = y2;
-                pts10[4 * tempi + 2] = x;
-                pts10[4 * tempi + 3] = y2;
-                pts20[4 * tempi + 0] = x;
-                pts20[4 * tempi + 1] = y3;
-                pts20[4 * tempi + 2] = x;
-                pts20[4 * tempi + 3] = y3;
-            } else {
-                pts5[4 * tempi + 0] = pts5[4 * (tempi - 1) + 2];
-                pts5[4 * tempi + 1] = pts5[4 * (tempi - 1) + 3];
-                pts5[4 * tempi + 2] = x;
-                pts5[4 * tempi + 3] = y1;
-                pts10[4 * tempi + 0] = pts10[4 * (tempi - 1) + 2];
-                pts10[4 * tempi + 1] = pts10[4 * (tempi - 1) + 3];
-                pts10[4 * tempi + 2] = x;
-                pts10[4 * tempi + 3] = y2;
-                pts20[4 * tempi + 0] = pts20[4 * (tempi - 1) + 2];
-                pts20[4 * tempi + 1] = pts20[4 * (tempi - 1) + 3];
-                pts20[4 * tempi + 2] = x;
-                pts20[4 * tempi + 3] = y3;
-            }
+        if (null == pts5 && null == pts10 && null == pts20) {
+            final int size = 4 * (indexEnd + 1);
+            pts5 = new float[size];
+            pts10 = new float[size];
+            pts20 = new float[size];
         }
 
+        final float tempx = entry.getxLabelReal();
+        final float x = tempx + pointWidth / 2 + xoffsetLeft + xoffsetRight;
+        Log.e("DrawTline", "drawMadline ==> j = " + j + ", indexBegin = " + indexBegin + ", indexEnd = " + indexEnd + ", x = " + x);
+        final float y1 = entry.getMa5Real();
+        final float y2 = entry.getMa10Real();
+        final float y3 = entry.getMa20Real();
+
+        //  final int tempi = j - indexBegin;
+        if (j == indexBegin) {
+            pts5[4 * j + 0] = x;
+            pts5[4 * j + 1] = y1;
+            pts5[4 * j + 2] = x;
+            pts5[4 * j + 3] = y1;
+            pts10[4 * j + 0] = x;
+            pts10[4 * j + 1] = y2;
+            pts10[4 * j + 2] = x;
+            pts10[4 * j + 3] = y2;
+            pts20[4 * j + 0] = x;
+            pts20[4 * j + 1] = y3;
+            pts20[4 * j + 2] = x;
+            pts20[4 * j + 3] = y3;
+        } else {
+            pts5[4 * j + 0] = pts5[4 * (j - 1) + 2];
+            pts5[4 * j + 1] = pts5[4 * (j - 1) + 3];
+            pts5[4 * j + 2] = x;
+            pts5[4 * j + 3] = y1;
+            pts10[4 * j + 0] = pts10[4 * (j - 1) + 2];
+            pts10[4 * j + 1] = pts10[4 * (j - 1) + 3];
+            pts10[4 * j + 2] = x;
+            pts10[4 * j + 3] = y2;
+            pts20[4 * j + 0] = pts20[4 * (j - 1) + 2];
+            pts20[4 * j + 1] = pts20[4 * (j - 1) + 3];
+            pts20[4 * j + 2] = x;
+            pts20[4 * j + 3] = y3;
+        }
+
+        if (j != indexEnd) return;
         canvas.drawLines(pts5, StockPaint.getLinePaint(StockPaint.STOCK_RED));
         canvas.drawLines(pts10, StockPaint.getLinePaint(StockPaint.STOCK_GREEN));
         canvas.drawLines(pts20, StockPaint.getLinePaint(Color.BLUE));
