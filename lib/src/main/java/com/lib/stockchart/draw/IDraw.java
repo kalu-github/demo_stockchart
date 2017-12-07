@@ -2,7 +2,7 @@ package com.lib.stockchart.draw;
 
 import android.graphics.Canvas;
 
-import com.lib.stockchart.render.BaseRender;
+import com.lib.stockchart.render.RenderCanvas;
 
 /**
  * description: 接口 - 画具体内容
@@ -52,5 +52,5 @@ public interface IDraw {
      * @param xlabelHeight K线图, 分时图, x坐标轴文字信息显示区域高度
      * @param boardPadding 边框内边距
      */
-    void onDrawData(BaseRender render, Canvas canvas, int pointMax, int indexBegin, int indexEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding);
+    void onDrawData(RenderCanvas render, Canvas canvas, int pointMax, int indexBegin, int indexEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding);
 }

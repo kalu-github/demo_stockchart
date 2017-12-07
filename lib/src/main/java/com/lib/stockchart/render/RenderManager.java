@@ -16,13 +16,10 @@ public class RenderManager {
     // 当前模式
     private int mRenderModel = MODEL_KLINE_TURNOVER;
     // K线
-    private KlineRender mKlineRender;
-    // 分时
-    private TlineRender mTlineRender;
+    private RenderCanvas mRenderCanvas;
 
     private RenderManager() {
-        mKlineRender = new KlineRender();
-        mTlineRender = new TlineRender();
+        mRenderCanvas = new RenderCanvas();
     }
 
     public static RenderManager getInstance() {
@@ -35,12 +32,8 @@ public class RenderManager {
 
     /*********************************************************************************************/
 
-    public KlineRender getKlineRender() {
-        return mKlineRender;
-    }
-
-    public TlineRender getTlineRender() {
-        return mTlineRender;
+    public RenderCanvas getRenderDraw() {
+        return mRenderCanvas;
     }
 
     public int getRenderModel() {

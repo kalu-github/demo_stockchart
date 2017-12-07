@@ -133,17 +133,9 @@ public class StockChartView extends View {
                 if (Math.abs(x - lastX) > 10) {
 
                     lastX = x;
-                    if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
-                        RenderManager.getInstance().getKlineRender().setxHighligh(x);
-                        RenderManager.getInstance().getKlineRender().setyHighligh(y);
-                        getParent().requestDisallowInterceptTouchEvent(true);
-                        invalidate();
-                    } else if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
-                        RenderManager.getInstance().getTlineRender().setxHighligh(x);
-                        RenderManager.getInstance().getTlineRender().setyHighligh(y);
-                        getParent().requestDisallowInterceptTouchEvent(true);
-                        invalidate();
-                    }
+                    RenderManager.getInstance().getRenderDraw().setxHighligh(x);
+                    RenderManager.getInstance().getRenderDraw().setyHighligh(y);
+                    getParent().requestDisallowInterceptTouchEvent(true);
                 }
 
                 break;
@@ -156,18 +148,11 @@ public class StockChartView extends View {
 
                 // 取消高亮
                 if (isHighLight) {
-                    if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
-                        RenderManager.getInstance().getKlineRender().setxHighligh(-1f);
-                        RenderManager.getInstance().getKlineRender().setyHighligh(-1f);
-                        invalidate();
-                    } else if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
-                        RenderManager.getInstance().getTlineRender().setxHighligh(-1f);
-                        RenderManager.getInstance().getTlineRender().setyHighligh(-1f);
-                        invalidate();
-                    }
+                    RenderManager.getInstance().getRenderDraw().setxHighligh(-1f);
+                    RenderManager.getInstance().getRenderDraw().setyHighligh(-1f);
+                    invalidate();
                     isHighLight = false;
                 }
-
 
                 // todo
                 if (canDragXoffset) {
@@ -191,9 +176,9 @@ public class StockChartView extends View {
         final int model = RenderManager.getInstance().getRenderModel();
 
         if (model == RenderManager.MODEL_TLINE_TURNOVER) {
-            RenderManager.getInstance().getTlineRender().onCanvas(canvas, 0, indexMax, indexMax, indexMax, 0, 0, loadingStr, xlabelHeight, boardPadding);
+            RenderManager.getInstance().getRenderDraw().onCanvas(canvas, 0, indexMax, indexMax, indexMax, 0, 0, loadingStr, xlabelHeight, boardPadding);
         } else if (model == RenderManager.MODEL_KLINE_TURNOVER) {
-            RenderManager.getInstance().getKlineRender().onCanvas(canvas, pointMax, indexBegin, indexEnd, indexMax, xoffsetLeft, xoffsetRight, loadingStr, xlabelHeight, boardPadding);
+            RenderManager.getInstance().getRenderDraw().onCanvas(canvas, pointMax, indexBegin, indexEnd, indexMax, xoffsetLeft, xoffsetRight, loadingStr, xlabelHeight, boardPadding);
         }
     }
 
@@ -206,8 +191,7 @@ public class StockChartView extends View {
         int top = getTop() + getPaddingTop();
         int right = getRight() - getPaddingRight();
         int bottom = getBottom() - getPaddingBottom();
-        RenderManager.getInstance().getKlineRender().onSizeChanged(left, top, right, bottom, xlabelHeight, boardPadding);
-        RenderManager.getInstance().getTlineRender().onSizeChanged(left, top, right, bottom, xlabelHeight, boardPadding);
+        RenderManager.getInstance().getRenderDraw().onSizeChanged(left, top, right, bottom, xlabelHeight, boardPadding);
 
         // IDE预览模式下, 添加测试数据
         if (!isInEditMode()) return;
@@ -273,18 +257,11 @@ public class StockChartView extends View {
             final float x = e.getX();
             final float y = e.getY();
 
-            if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
-                RenderManager.getInstance().getKlineRender().setxHighligh(x);
-                RenderManager.getInstance().getKlineRender().setyHighligh(y);
-                getParent().requestDisallowInterceptTouchEvent(true);
-                invalidate();
-            } else if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
-                RenderManager.getInstance().getTlineRender().setxHighligh(x);
-                RenderManager.getInstance().getTlineRender().setyHighligh(y);
-                getParent().requestDisallowInterceptTouchEvent(true);
-                mVibrator.vibrate(25);
-                invalidate();
-            }
+            RenderManager.getInstance().getRenderDraw().setxHighligh(x);
+            RenderManager.getInstance().getRenderDraw().setyHighligh(y);
+            getParent().requestDisallowInterceptTouchEvent(true);
+            mVibrator.vibrate(25);
+            invalidate();
         }
 
         @Override
@@ -549,29 +526,25 @@ public class StockChartView extends View {
 
     @Override
     protected void onDetachedFromWindow() {
-        RenderManager.getInstance().getKlineRender().clearData();
-        RenderManager.getInstance().getTlineRender().clearData();
+        RenderManager.getInstance().getRenderDraw().clearData();
         super.onDetachedFromWindow();
     }
 
     @Override
     protected void onAttachedToWindow() {
-        RenderManager.getInstance().getKlineRender().addData();
-        RenderManager.getInstance().getTlineRender().addData();
+        RenderManager.getInstance().getRenderDraw().addData();
         super.onAttachedToWindow();
     }
 
     @Override
     public void onStartTemporaryDetach() {
-        RenderManager.getInstance().getKlineRender().addData();
-        RenderManager.getInstance().getTlineRender().addData();
+        RenderManager.getInstance().getRenderDraw().addData();
         super.onStartTemporaryDetach();
     }
 
     @Override
     public void onFinishTemporaryDetach() {
-        RenderManager.getInstance().getKlineRender().clearData();
-        RenderManager.getInstance().getTlineRender().clearData();
+        RenderManager.getInstance().getRenderDraw().clearData();
         super.onFinishTemporaryDetach();
     }
 

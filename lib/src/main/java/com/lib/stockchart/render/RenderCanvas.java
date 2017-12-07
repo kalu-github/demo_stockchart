@@ -1,19 +1,24 @@
 package com.lib.stockchart.render;
 
 import android.graphics.Canvas;
+import android.util.Log;
 
+import com.lib.stockchart.draw.DrawKline;
+import com.lib.stockchart.draw.DrawTline;
+import com.lib.stockchart.draw.DrawTurnover;
 import com.lib.stockchart.draw.IDraw;
 import com.lib.stockchart.entry.Entry;
 import com.lib.stockchart.entry.EntryManager;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
  * description: 当前类描述信息
  * created by kalu on 2017/11/11 15:59
  */
-public abstract class BaseRender {
+public class RenderCanvas {
 
     // 默认-1, 不显示高亮
     private float xHighligh = -1f;
@@ -38,7 +43,7 @@ public abstract class BaseRender {
     }
 
     // 股票指标列表
-    private final List<IDraw> mDrawList = new ArrayList<>();
+    private final LinkedList<IDraw> mDrawList = new LinkedList<>();
     // 显示区域
     int left, top, right, bottom, width, height;
 
@@ -49,7 +54,7 @@ public abstract class BaseRender {
         this.bottom = bottom;
         this.width = right - left;
         this.height = bottom - top;
-        // Log.e("BaseRender", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom + ", width = " + width + ", height = " + height);
+        // Log.e("RenderCanvas", "left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom + ", width = " + width + ", height = " + height);
 
         for (IDraw drawing : mDrawList) {
             drawing.onDrawInit(this.left, this.top, this.right, this.bottom, this.width, this.height, xlabelHeight, boardPadding);
@@ -147,11 +152,66 @@ public abstract class BaseRender {
      * @param xlabelHeight  x坐标轴显示信息总高度
      * @param boardPadding  内边距
      */
-    public abstract void onCanvas(Canvas canvas, int pointMax, int indexBegin, int indexEnd, int indexCountMax, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding);
+    public void onCanvas(Canvas canvas, int pointMax, int indexBegin, int indexEnd, int indexCountMax, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding) {
+        final List<IDraw> drawList = getDrawList();
+
+        if (indexCountMax <= 0) {
+            Log.e("RenderCanvas", "onCanvas ==> indexCountMax <= 0");
+            for (IDraw drawing : drawList) {
+
+                if (drawing instanceof DrawTurnover) {
+                    Log.e("RenderCanvas", "onCanvas ==> onDrawNull - DrawTurnover");
+                    drawing.onDrawNull(canvas, loadingStr, xlabelHeight, boardPadding);
+                }
+
+                if (drawing instanceof DrawTline && RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
+                    Log.e("RenderCanvas", "onCanvas ==> onDrawNull - DrawTline");
+                    drawing.onDrawNull(canvas, loadingStr, xlabelHeight, boardPadding);
+                } else if (drawing instanceof DrawKline && RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
+                    Log.e("RenderCanvas", "onCanvas ==> onDrawNull - DrawKline");
+                    drawing.onDrawNull(canvas, loadingStr, xlabelHeight, boardPadding);
+                }
+            }
+        } else {
+            Log.e("RenderCanvas", "onCanvas ==> indexCountMax > 0");
+
+            if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
+                final float minPrice = EntryManager.getInstance().calculatePriceMin(indexBegin, indexCountMax);
+                final float maxPrice = EntryManager.getInstance().calculatePriceMax(indexBegin, indexCountMax);
+                final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexCountMax);
+                calculateData(0, indexCountMax, xlabelHeight, boardPadding);
+
+                for (IDraw temp : drawList) {
+                    if (temp instanceof DrawTurnover || temp instanceof DrawTline) {
+                        Log.e("RenderCanvas", "onCanvas ==> onDrawData - Tline");
+                        temp.onDrawData(this, canvas, indexCountMax, 0, indexCountMax, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
+                    }
+                }
+            } else if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
+
+                calculateData(indexBegin, indexEnd, xlabelHeight, boardPadding);
+                final float minPrice = EntryManager.getInstance().calculatePriceMin(indexBegin, indexEnd);
+                final float maxPrice = EntryManager.getInstance().calculatePriceMax(indexBegin, indexEnd);
+                final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexEnd);
+
+                for (IDraw temp : drawList) {
+                    if (temp instanceof DrawTurnover || temp instanceof DrawKline) {
+                        Log.e("RenderCanvas", "onCanvas ==> onDrawData - Kline");
+                        temp.onDrawData(this, canvas, pointMax, indexBegin, indexEnd, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
+                    }
+                }
+            }
+        }
+    }
 
     public void clearData() {
         mDrawList.clear();
     }
 
-    public abstract void addData();
+    public void addData() {
+        if (mDrawList.size() != 0) return;
+        mDrawList.add(new DrawTurnover());
+        mDrawList.add(new DrawTline());
+        mDrawList.add(new DrawKline());
+    }
 }

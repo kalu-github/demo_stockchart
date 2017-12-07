@@ -9,7 +9,7 @@ import android.util.Log;
 import com.lib.stockchart.entry.Entry;
 import com.lib.stockchart.entry.EntryManager;
 import com.lib.stockchart.paint.StockPaint;
-import com.lib.stockchart.render.BaseRender;
+import com.lib.stockchart.render.RenderCanvas;
 import com.lib.stockchart.render.RenderManager;
 
 import java.util.List;
@@ -61,7 +61,7 @@ public class DrawTline implements IDraw {
     }
 
     @Override
-    public void onDrawData(BaseRender render, Canvas canvas, int pointMax, int indexBegin, int indexEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding) {
+    public void onDrawData(RenderCanvas render, Canvas canvas, int pointMax, int indexBegin, int indexEnd, float minPrice, float maxPrice, float maxTurnover, float xHighligh, float yHighligh, float xoffsetLeft, float xoffsetRight, float xlabelHeight, float boardPadding) {
         //  Log.e("DrawKline", "onDrawData ==> pointSum = " + pointSum + ", pointBegin = " + pointBegin + ", pointEnd = " + pointEnd + ", minPrice = " + minPrice + ", maxPrice = " + maxPrice + ", maxTurnover = " + maxTurnover);
 
         if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER)

@@ -87,8 +87,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadData() {
 
-        final List<Entry> aVoid = EntryManagerTest.parseKLineData(EntryManagerTest.KLINE);
-        final StockChartView mStockChartView = findViewById(R.id.kLineLayout);
-        mStockChartView.addDataSetChanged(aVoid);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                final List<Entry> aVoid = EntryManagerTest.parseKLineData(EntryManagerTest.KLINE);
+                final StockChartView mStockChartView = findViewById(R.id.kLineLayout);
+                mStockChartView.addDataSetChanged(aVoid);
+            }
+        }, 500);
     }
 }
