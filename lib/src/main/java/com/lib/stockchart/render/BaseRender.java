@@ -1,18 +1,10 @@
 package com.lib.stockchart.render;
 
 import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.RectF;
-import android.util.Log;
-import android.util.SparseArray;
 
-import com.lib.stockchart.draw.DrawKline;
-import com.lib.stockchart.draw.DrawTline;
-import com.lib.stockchart.draw.DrawTurnover;
 import com.lib.stockchart.draw.IDraw;
 import com.lib.stockchart.entry.Entry;
 import com.lib.stockchart.entry.EntryManager;
-import com.lib.stockchart.paint.StockPaint;
 
 import java.util.ArrayList;
 import java.util.List;

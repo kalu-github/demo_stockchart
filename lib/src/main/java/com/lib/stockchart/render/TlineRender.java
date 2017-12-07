@@ -1,7 +1,6 @@
 package com.lib.stockchart.render;
 
 import android.graphics.Canvas;
-import android.util.Log;
 
 import com.lib.stockchart.draw.DrawTline;
 import com.lib.stockchart.draw.DrawTurnover;

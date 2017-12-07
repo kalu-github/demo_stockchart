@@ -3,17 +3,13 @@ package com.lib.stockchart.draw;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.text.TextUtils;
-import android.util.Log;
 
-import com.lib.stockchart.render.BaseRender;
 import com.lib.stockchart.entry.Entry;
 import com.lib.stockchart.entry.EntryManager;
 import com.lib.stockchart.paint.StockPaint;
-import com.lib.stockchart.render.RenderManager;
+import com.lib.stockchart.render.BaseRender;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

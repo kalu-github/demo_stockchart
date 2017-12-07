@@ -4,8 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.TextUtils;
-import android.util.Log;
-import android.util.SparseArray;
 
 import com.lib.stockchart.entry.Entry;
 import com.lib.stockchart.entry.EntryManager;
@@ -13,7 +11,6 @@ import com.lib.stockchart.paint.StockPaint;
 import com.lib.stockchart.render.BaseRender;
 import com.lib.stockchart.render.RenderManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

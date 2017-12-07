@@ -1,30 +1,23 @@
 package com.demo.stockchart;
 
-import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.SparseArray;
 import android.view.View;
 
 import com.lib.stockchart.OnStockChartChangeListenerSimple;
 import com.lib.stockchart.StockChartView;
 import com.lib.stockchart.entry.Entry;
-import com.lib.stockchart.entry.EntryManager;
 import com.lib.stockchart.entry.EntryManagerTest;
 import com.lib.stockchart.render.RenderManager;
 
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private int temp = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
 
-    @SuppressLint("StaticFieldLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.util.Log;
 
 import com.lib.stockchart.draw.DrawKline;
-import com.lib.stockchart.draw.DrawTline;
 import com.lib.stockchart.draw.DrawTurnover;
 import com.lib.stockchart.draw.IDraw;
 import com.lib.stockchart.entry.EntryManager;

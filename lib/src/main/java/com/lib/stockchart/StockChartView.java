@@ -15,12 +15,11 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.animation.Interpolator;
 
-import com.lib.stockchart.entry.EntryManagerTest;
 import com.lib.stockchart.entry.Entry;
 import com.lib.stockchart.entry.EntryManager;
+import com.lib.stockchart.entry.EntryManagerTest;
 import com.lib.stockchart.render.RenderManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.VIBRATOR_SERVICE;
