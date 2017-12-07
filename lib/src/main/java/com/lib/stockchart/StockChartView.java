@@ -136,6 +136,7 @@ public class StockChartView extends View {
                     RenderManager.getInstance().getRenderDraw().setxHighligh(x);
                     RenderManager.getInstance().getRenderDraw().setyHighligh(y);
                     getParent().requestDisallowInterceptTouchEvent(true);
+                    invalidate();
                 }
 
                 break;
