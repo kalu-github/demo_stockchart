@@ -134,10 +134,6 @@ public class RenderCanvas {
         }
     }
 
-    public List<IDraw> getDrawList() {
-        return mDrawList;
-    }
-
     /**********************************************************************************************/
 
     /**
@@ -153,27 +149,27 @@ public class RenderCanvas {
      * @param boardPadding  内边距
      */
     public void onCanvas(Canvas canvas, int pointMax, int indexBegin, int indexEnd, int indexCountMax, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding) {
-        final List<IDraw> drawList = getDrawList();
+     //   final List<IDraw> drawList = getDrawList();
 
         if (indexCountMax <= 0) {
-            Log.e("RenderCanvas", "onCanvas ==> indexCountMax <= 0");
-            for (IDraw drawing : drawList) {
+          //  Log.e("RenderCanvas", "onCanvas ==> indexCountMax <= 0");
+            for (IDraw drawing : mDrawList) {
 
                 if (drawing instanceof DrawTurnover) {
-                    Log.e("RenderCanvas", "onCanvas ==> onDrawNull - DrawTurnover");
+                 //   Log.e("RenderCanvas", "onCanvas ==> onDrawNull - DrawTurnover");
                     drawing.onDrawNull(canvas, loadingStr, xlabelHeight, boardPadding);
                 }
 
                 if (drawing instanceof DrawTline && RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
-                    Log.e("RenderCanvas", "onCanvas ==> onDrawNull - DrawTline");
+                  //  Log.e("RenderCanvas", "onCanvas ==> onDrawNull - DrawTline");
                     drawing.onDrawNull(canvas, loadingStr, xlabelHeight, boardPadding);
                 } else if (drawing instanceof DrawKline && RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
-                    Log.e("RenderCanvas", "onCanvas ==> onDrawNull - DrawKline");
+                //    Log.e("RenderCanvas", "onCanvas ==> onDrawNull - DrawKline");
                     drawing.onDrawNull(canvas, loadingStr, xlabelHeight, boardPadding);
                 }
             }
         } else {
-            Log.e("RenderCanvas", "onCanvas ==> indexCountMax > 0");
+           // Log.e("RenderCanvas", "onCanvas ==> indexCountMax > 0");
 
             if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
                 final float minPrice = EntryManager.getInstance().calculatePriceMin(indexBegin, indexCountMax);
@@ -181,9 +177,9 @@ public class RenderCanvas {
                 final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexCountMax);
                 calculateData(0, indexCountMax, xlabelHeight, boardPadding);
 
-                for (IDraw temp : drawList) {
+                for (IDraw temp : mDrawList) {
                     if (temp instanceof DrawTurnover || temp instanceof DrawTline) {
-                        Log.e("RenderCanvas", "onCanvas ==> onDrawData - Tline");
+                      //  Log.e("RenderCanvas", "onCanvas ==> onDrawData - Tline");
                         temp.onDrawData(this, canvas, indexCountMax, 0, indexCountMax, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
                     }
                 }
@@ -194,9 +190,9 @@ public class RenderCanvas {
                 final float maxPrice = EntryManager.getInstance().calculatePriceMax(indexBegin, indexEnd);
                 final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexEnd);
 
-                for (IDraw temp : drawList) {
+                for (IDraw temp : mDrawList) {
                     if (temp instanceof DrawTurnover || temp instanceof DrawKline) {
-                        Log.e("RenderCanvas", "onCanvas ==> onDrawData - Kline");
+                       // Log.e("RenderCanvas", "onCanvas ==> onDrawData - Kline");
                         temp.onDrawData(this, canvas, pointMax, indexBegin, indexEnd, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
                     }
                 }
