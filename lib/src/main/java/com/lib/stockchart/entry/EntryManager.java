@@ -25,12 +25,6 @@ public class EntryManager {
         return pointWidth;
     }
 
-    private volatile int pointHighlight = -1;
-    // 高亮点, X坐标索引(第一个上一次, 第二个最新的)
-    private volatile float[] pointHighlightX = new float[]{-1, -1};
-    // 高亮点, Y坐标索引(第一个上一次, 第二个最新的)
-    private volatile float[] pointHighlightY = new float[]{-1, -1};
-
     public float getPointSpace() {
         return pointSpace;
     }
@@ -75,11 +69,6 @@ public class EntryManager {
 
     // 重置数据
     public void resetData() {
-        pointHighlightX[0] = -1;
-        pointHighlightX[1] = -1;
-        pointHighlightY[0] = -1;
-        pointHighlightY[1] = -1;
-        pointHighlight = -1;
         entries = null;
     }
 
