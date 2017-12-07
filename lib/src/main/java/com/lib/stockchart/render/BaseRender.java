@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.lib.stockchart.draw.DrawKline;
 import com.lib.stockchart.draw.DrawTline;

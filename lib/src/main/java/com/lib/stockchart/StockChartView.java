@@ -5,7 +5,6 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.os.Vibrator;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v4.widget.ScrollerCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -16,7 +15,7 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.animation.Interpolator;
 
-import com.lib.stockchart.entry.StockDataTest;
+import com.lib.stockchart.entry.EntryManagerTest;
 import com.lib.stockchart.entry.Entry;
 import com.lib.stockchart.entry.EntryManager;
 import com.lib.stockchart.render.RenderManager;
@@ -199,7 +198,7 @@ public class StockChartView extends View {
 
         // IDE预览模式下, 添加测试数据
         if (!isInEditMode()) return;
-        final ArrayList<Entry> entries = StockDataTest.parseKLineData(StockDataTest.KLINE);
+        final List<Entry> entries = EntryManagerTest.parseKLineData(EntryManagerTest.KLINE);
         addDataSetChanged(entries);
     }
 

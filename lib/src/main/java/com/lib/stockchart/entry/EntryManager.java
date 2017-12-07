@@ -1,5 +1,7 @@
 package com.lib.stockchart.entry;
 
+import android.util.SparseArray;
+
 import java.util.List;
 
 /**
