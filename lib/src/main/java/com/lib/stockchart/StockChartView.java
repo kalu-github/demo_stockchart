@@ -177,9 +177,9 @@ public class StockChartView extends View {
         final int model = RenderManager.getInstance().getRenderModel();
 
         if (model == RenderManager.MODEL_TLINE_TURNOVER) {
-            RenderManager.getInstance().getRenderDraw().onCanvas(canvas, 0, indexMax, indexMax, indexMax, 0, 0, loadingStr, xlabelHeight, boardPadding);
+            RenderManager.getInstance().getRenderDraw().onCanvas(canvas, 0, 0, indexMax, 0, 0, loadingStr, xlabelHeight, boardPadding);
         } else if (model == RenderManager.MODEL_KLINE_TURNOVER) {
-            RenderManager.getInstance().getRenderDraw().onCanvas(canvas, pointMax, indexBegin, indexEnd, indexMax, xoffsetLeft, xoffsetRight, loadingStr, xlabelHeight, boardPadding);
+            RenderManager.getInstance().getRenderDraw().onCanvas(canvas, pointMax, indexBegin, indexEnd, xoffsetLeft, xoffsetRight, loadingStr, xlabelHeight, boardPadding);
         }
     }
 

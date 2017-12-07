@@ -141,17 +141,16 @@ public class RenderCanvas {
      * @param pointMax      最多显示个数
      * @param indexBegin    起始下标
      * @param indexEnd      结束下标
-     * @param indexCountMax 真实数据的个数
      * @param xoffsetLeft   左侧拖拽位移
      * @param xoffsetRight  右侧拖拽位移
      * @param loadingStr    加载信息
      * @param xlabelHeight  x坐标轴显示信息总高度
      * @param boardPadding  内边距
      */
-    public void onCanvas(Canvas canvas, int pointMax, int indexBegin, int indexEnd, int indexCountMax, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding) {
+    public void onCanvas(Canvas canvas, int pointMax, int indexBegin, int indexEnd, float xoffsetLeft, float xoffsetRight, String loadingStr, float xlabelHeight, float boardPadding) {
      //   final List<IDraw> drawList = getDrawList();
 
-        if (indexCountMax <= 0) {
+        if (indexEnd <= 0) {
           //  Log.e("RenderCanvas", "onCanvas ==> indexCountMax <= 0");
             for (IDraw drawing : mDrawList) {
 
@@ -172,15 +171,15 @@ public class RenderCanvas {
            // Log.e("RenderCanvas", "onCanvas ==> indexCountMax > 0");
 
             if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_TLINE_TURNOVER) {
-                final float minPrice = EntryManager.getInstance().calculatePriceMin(indexBegin, indexCountMax);
-                final float maxPrice = EntryManager.getInstance().calculatePriceMax(indexBegin, indexCountMax);
-                final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexCountMax);
-                calculateData(0, indexCountMax, xlabelHeight, boardPadding);
+                final float minPrice = EntryManager.getInstance().calculatePriceMin(indexBegin, indexEnd);
+                final float maxPrice = EntryManager.getInstance().calculatePriceMax(indexBegin, indexEnd);
+                final float turnoverMax = EntryManager.getInstance().calculateTurnoverMax(indexBegin, indexEnd);
+                calculateData(0, indexEnd, xlabelHeight, boardPadding);
 
                 for (IDraw temp : mDrawList) {
                     if (temp instanceof DrawTurnover || temp instanceof DrawTline) {
                       //  Log.e("RenderCanvas", "onCanvas ==> onDrawData - Tline");
-                        temp.onDrawData(this, canvas, indexCountMax, 0, indexCountMax, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
+                        temp.onDrawData(this, canvas, indexEnd, 0, indexEnd, minPrice, maxPrice, turnoverMax, getxHighligh(), getyHighligh(), xoffsetLeft, xoffsetRight, xlabelHeight, boardPadding);
                     }
                 }
             } else if (RenderManager.getInstance().getRenderModel() == RenderManager.MODEL_KLINE_TURNOVER) {
