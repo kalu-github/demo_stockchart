@@ -8,8 +8,6 @@ import java.util.List;
  */
 public class EntryManager {
 
-    //    // 图标边框和信息的内边距
-//    private float boardPadding = 10f;
     // 上部权重
     private int weightTop = 5;
     // 下部权重
@@ -39,55 +37,6 @@ public class EntryManager {
 
     public void setPointSpace(float pointSpace) {
         this.pointSpace = pointSpace;
-    }
-
-//    public float getBoardPadding() {
-//        return boardPadding;
-//    }
-//
-//    public void setBoardPadding(float boardPadding) {
-//        this.boardPadding = boardPadding;
-//    }
-
-    public int getPointHighlight() {
-        return pointHighlight;
-    }
-
-    public void setPointHighlight(int pointHighlight) {
-        this.pointHighlight = pointHighlight;
-    }
-
-    public float[] getPointHighlightX() {
-        return pointHighlightX;
-    }
-
-    public void setPointHighlightX(boolean clear, float x) {
-
-        if (clear) {
-            pointHighlightX[0] = x;
-            pointHighlightX[1] = x;
-        } else {
-            float temp = pointHighlightX[1];
-            pointHighlightX[0] = temp;
-            pointHighlightX[1] = x;
-        }
-    }
-
-    public float[] getPointHighlightY() {
-        return pointHighlightY;
-    }
-
-    public void setPointHighlightY(float oldX, float newX) {
-        pointHighlightY[0] = oldX != -2f ? oldX : pointHighlightY[1];
-        pointHighlightY[1] = newX;
-    }
-
-    public boolean isHighlightMove() {
-
-        float x1 = pointHighlightX[0];
-        float x2 = pointHighlightX[1];
-        // Log.e("ooooooo1", "x1 = " + x1 + ", x2 = " + x2);
-        return x1 != x2;
     }
 
     public int getWeightTop() {
@@ -122,11 +71,6 @@ public class EntryManager {
 
     public List<Entry> getEntryList() {
         return entries;
-    }
-
-    public int getIndexMax() {
-        if (null == entries) return 0;
-        else return entries.size() - 1;
     }
 
     // 重置数据
