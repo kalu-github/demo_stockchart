@@ -52,9 +52,10 @@
             app:scv_xoffset_enable="true"
             app:scv_xoffset_max="80dp" />
 ```
-```
-使用方法：
 
+##
+## 使用方法
+```
 1.添加数据, 即刷新界面
 StockChartView.addDataSetChanged(List<Entey>);
 2.删除数据
